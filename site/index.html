@@ -2,7 +2,25 @@
     <head>
         <title> Invoice Program </title>
     </head>
+    <link rel="stylesheet" href="indexStyles.css">
     <body>
+        <header>
+            <h1>Invoice Program</h1>
+        </header>
         
+        <div class="tab">
+            <button class="tablink" onclick="openTab(event, 'create')">Invoice Creation</button>
+            <button class="tablink" onclick="openTab(event, 'summary')">Summary of Invoices</button>
+        </div>
+
+        <div id="create" class="tabcontent">
+            Invoice Creation Test
+        </div>
+
+        <div id="summary" class="tabcontent">
+            Summary of Invoices Test
+        </div>
     </body>
+
+    <script src="indexScript.js"></script>
 </html>
