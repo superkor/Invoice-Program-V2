@@ -3,7 +3,7 @@
         <title> Invoice Program </title>
     </head>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/indexStyles.css')}}">
-    <body>
+    <body onload="onLoad()">
         <header>
             <h1>Invoice Program</h1>
         </header>
@@ -13,14 +13,34 @@
             <button class="tablink" onclick="openTab(event, 'summary')">Summary of Invoices</button>
         </div>
 
-        <div id="create" class="tabcontent">
+        <div id="create" class="tabcontent" style="display:block">
             Invoice Creation Test
             <form action="create" method="GET" enctype="multipart/form-data">
-                <label for="name">Name</label>
-                <input type="text" id="name" name="name" value="" required>
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" value="" required>
-                <input type="submit" value="Submit">
+                <div id = "Season">
+                    <label for="season">Season</label>
+                    <!-- Will add a function to populate seasons based on what invoice template exists -->
+                    <select name = "season">
+                        <option value = "2019-2020">2019-2020</option>
+                        <option value = "2020-2021">2020-2021</option>
+                    </select>
+                </div>
+                <div id = "Month">
+                    <!-- Function addMonthOptions() adds options for dropdown -->
+                    <label for="month">Season</label>
+                    <select name = "month" id="monthDropDown">
+                    </select>
+                </div>
+                <div id = "Name">
+                    <label for="name">Name</label>
+                    <input type="text" name="name" value="" placeholder="Name of Coach" required>
+                </div>
+                <div id = "Rate">
+                    <label for="rate">Hourly Rate</label>
+                    <input type="number" name="rate" value="" placeholder="Hourly Rate" required>
+                </div>
+                <div>
+                    <input type="submit" value="Submit">
+                </div>
             </form>
         </div>
 

@@ -35,3 +35,9 @@ body {font-family: Verdana;}
     border: 1px solid #ccc;
     border-top: none;
   }
+
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }

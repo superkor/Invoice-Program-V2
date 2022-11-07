@@ -11,3 +11,19 @@ function openTab(evt, tab){
     document.getElementById(tab).style.display = "block";
     evt.currentTarget.className += " active";
 }
+
+function addMonthOptions(){
+    var newMonth
+    months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+    monthSelect = document.getElementById("monthDropDown")
+    for (i=0; i < 12; i++){
+        newMonth = document.createElement("option")
+        newMonth.setAttribute("value",months[i])
+        newMonth.innerHTML = months[i]
+        monthSelect.appendChild(newMonth)
+    }
+}
+
+function onLoad(){
+    addMonthOptions();
+}
