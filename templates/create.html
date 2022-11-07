@@ -1,0 +1,21 @@
+<html>
+    <head>
+        <title> Invoice Program </title>
+    </head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/indexStyles.css')}}">
+    <body>
+        <header>
+            <h1>Invoice Program</h1>
+        </header>
+        <div>
+            <h1>Name</h1>
+            <p>{{ result[0] }}</p>
+        </div>
+        <div>
+            <h1>Email</h1>
+            <p>{{ result[1] }}</p>
+        </div>
+    </body>
+
+    <script src="{{ url_for('static', filename='js/indexScript.js')}}"></script>
+</html>
