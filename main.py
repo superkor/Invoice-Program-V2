@@ -13,4 +13,16 @@ def createInvoice():
     month = request.args.get('month')
     name=request.args.get("name")
     rate=request.args.get("rate")
-    return render_template('create.html', result=[season,month,name,rate])
+    comments = request.args.get("comments")
+    listSessions = request.args.getlist("session-type")
+    listSessionsAmount = request.args.getlist("session-amount")
+    listSessionsDate = request.args.getlist("date-of-session")
+
+    numberSessions = len(listSessions)
+
+    sessions = {}
+    #creating dict of sessions
+    for x in range (numberSessions):
+        sessions["session"+str(x)] = {"type": listSessions[x], "amount": listSessionsAmount[x], "date": listSessionsDate[x]}
+
+    return render_template('index.html', result=[season,month,name,rate, comments, sessions])
