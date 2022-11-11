@@ -1,6 +1,8 @@
 <html>
     <head>
         <title> Invoice Program </title>
+        <script src="{{ url_for('static', filename='js/indexScript.js')}}"></script>
+        <script src="{{ url_for('static', filename='js/jquery.js')}}"></script>
     </head>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/indexStyles.css')}}">
     <body onload="onLoad()">
@@ -86,6 +88,4 @@
             Summary of Invoices Test
         </div>
     </body>
-
-    <script src="{{ url_for('static', filename='js/indexScript.js')}}"></script>
 </html>
