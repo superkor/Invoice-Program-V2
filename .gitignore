@@ -2,3 +2,4 @@ venv
 .vscode
 layout.png
 __pycache__
+jquery.js
