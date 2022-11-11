@@ -51,7 +51,7 @@ function addSession(){
     let dropDownSelect = document.createElement("select")
     let deleteButton = document.createElement("input")
     dropDownSelect.setAttribute("name","session-type")
-    dropDownSelect.setAttribute("required", "true")
+    dropDownSelect.setAttribute("required", "")
 
     deleteButton.setAttribute("type", "button")
     deleteButton.setAttribute("id","deleteSession")
@@ -127,13 +127,13 @@ function addSession(){
     numInput.setAttribute("name","session-amount")
     numInput.setAttribute("type","number")
     numInput.setAttribute("placeholder","Number of Sessions")
-    numInput.setAttribute("required","true")
+    numInput.setAttribute("required","")
     numSpan.appendChild(numInput)
 
     dateInput = document.createElement("input")
     dateInput.setAttribute("name","date-of-session")
     dateInput.setAttribute("type","date")
-    dateInput.setAttribute("required","true")
+    dateInput.setAttribute("required","")
     dateSpan.appendChild(dateInput)
 
     newSession.setAttribute("id","Session"+numSessions)
