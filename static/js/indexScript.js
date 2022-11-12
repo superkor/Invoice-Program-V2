@@ -31,8 +31,16 @@ function addMonthOptions(){
 }
 
 function onLoad(){
-    numSessions = 2
-    addMonthOptions();
+    //if user clicked submit from Invoice Creation
+    if (window.location.href.includes("create")){
+        document.getElementById("fromCreate").setAttribute("style", "display:block")
+        document.getElementById("createButton").setAttribute("class", "tablink")
+        document.getElementById("create").setAttribute("style", "display:none")
+        document.getElementById("main").setAttribute("style", "display:none")
+    } else{
+        numSessions = 2
+        addMonthOptions()
+    }
 }
 
 function deleteSession(event){

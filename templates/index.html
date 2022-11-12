@@ -9,83 +9,111 @@
         <header>
             <h1>Invoice Program</h1>
         </header>
-        
-        <div class="tab">
-            <button class="tablink active" onclick="openTab(event, 'create')">Invoice Creation</button>
-            <button class="tablink" onclick="openTab(event, 'summary')">Summary of Invoices</button>
-        </div>
-
-        <div id="create" class="tabcontent" style="display:block">
-            Invoice Creation Test
-            <form action="create" method="GET" enctype="multipart/form-data">
-                <div id = "Season">
-                    <label for="season">Season</label>
-                    <!-- Will add a function to populate seasons based on what invoice template exists -->
-                    <select name = "season" required>
-                        <option value ="">Select a season</option>
-                        <option value = "2019-2020">2019-2020</option>
-                        <option value = "2020-2021">2020-2021</option>
-                        <option value = "2021-2022">2021-2022</option>
-                        <option value = "2022-2023">2022-2023</option>
-                        <option value = "2023-2024">2023-2024</option>
-                    </select>
-                </div>
-                <div id = "Month">
-                    <!-- Function addMonthOptions() adds options for dropdown -->
-                    <label for="month">Month</label>
-                    <select name = "month" id="monthDropDown" required>
-                    </select>
-                </div>
-                <div id = "Name">
-                    <label for="name">Name</label>
-                    <input type="text" name="name" value="" placeholder="Name of Coach" required oninvalid="this.setCustomValidity('test')" oninput="this.setCustomValidity('')"> 
-                </div>
-                <div id = "Rate">
-                    <label for="rate">Hourly Rate</label>
-                    <input type="number" name="rate" value="" placeholder="Hourly Rate" required>
-                </div>
-
-                <div id = "Comments">
-                    <label for="comments">Comments</label>
-                    <textarea name="comments" id="comments" rows="4" cols="50"></textarea>
-                </div>
-                <div id = "List-Of-Sessions">
-                    <div id = "Session1">
-                        <span>
-                            <select name = "session-type" required>
-                                <option value="" selected disabled hidden>Select Session</option>
-                                <option value="PCS">Pre-Canskate (PCS)</option>
-                                <option value="CS">Canskate (CS)</option>
-                                <option value="FZ">Fun Zone (FZ)</option>
-                                <option value="NV">Novice (NV)</option>
-                                <option value="PEP">PEP</option>
-                                <option value="AD">Adult (AD)</option>
-                                <option value="PW">Power (PW)</option>
-                                <option value="ST">Stroking (ST)</option>
-                                <option value="CIR">Canskate - Circuit Drawing (CIR)</option>
-                                <option value="RPT">Pre-Canskate/Canskate - Report Card (PCS)</option>
-                            </select>
-                        </span>
-                        <span>
-                            <input type="number" name="session-amount" placeholder="Number of Sessions" required>
-                        </span>
-                        <span>
-                            <input type="date" name="date-of-session" required>
-                        </span>
+        <div id = "main">
+            <div class="tab">
+                <button id = "createButton" class="tablink active" onclick="openTab(event, 'create')">Invoice Creation</button>
+                <button id = "summaryButton" class="tablink" onclick="openTab(event, 'summary')">Summary of Invoices</button>
+            </div>
+    
+            <div id="create" class="tabcontent" style="display:block">
+                Invoice Creation Test
+                <form action="create" method="GET" enctype="multipart/form-data">
+                    <div id = "Season">
+                        <label for="season">Season</label>
+                        <!-- Will add a function to populate seasons based on what invoice template exists -->
+                        <select name = "season" required>
+                            <option value ="">Select a season</option>
+                            <option value = "2019-2020">2019-2020</option>
+                            <option value = "2020-2021">2020-2021</option>
+                            <option value = "2021-2022">2021-2022</option>
+                            <option value = "2022-2023">2022-2023</option>
+                            <option value = "2023-2024">2023-2024</option>
+                        </select>
                     </div>
-                </div>
-                <!-- addSession() on button adds new div to add new sessions. each new session div will have a delete button that will delete the created session div -->
-                <div id="AddSession">
-                    <input type="button" name="add-session" value = "Add Session" onclick="addSession()">
-                </div>
-                <div>
-                    <input type="submit" value="Submit">
-                </div>
-            </form>
+                    <div id = "Month">
+                        <!-- Function addMonthOptions() adds options for dropdown -->
+                        <label for="month">Month</label>
+                        <select name = "month" id="monthDropDown" required>
+                        </select>
+                    </div>
+                    <div id = "Name">
+                        <label for="name">Name</label>
+                        <input type="text" name="name" value="" placeholder="Name of Coach" required oninvalid="this.setCustomValidity('test')" oninput="this.setCustomValidity('')"> 
+                    </div>
+                    <div id = "Rate">
+                        <label for="rate">Hourly Rate</label>
+                        <input type="number" name="rate" value="" placeholder="Hourly Rate" required>
+                    </div>
+    
+                    <div id = "Comments">
+                        <label for="comments">Comments</label>
+                        <textarea name="comments" id="comments" rows="4" cols="50"></textarea>
+                    </div>
+                    <div id = "List-Of-Sessions">
+                        <div id = "Session1">
+                            <span>
+                                <select name = "session-type" required>
+                                    <option value="" selected disabled hidden>Select Session</option>
+                                    <option value="PCS">Pre-Canskate (PCS)</option>
+                                    <option value="CS">Canskate (CS)</option>
+                                    <option value="FZ">Fun Zone (FZ)</option>
+                                    <option value="NV">Novice (NV)</option>
+                                    <option value="PEP">PEP</option>
+                                    <option value="AD">Adult (AD)</option>
+                                    <option value="PW">Power (PW)</option>
+                                    <option value="ST">Stroking (ST)</option>
+                                    <option value="CIR">Canskate - Circuit Drawing (CIR)</option>
+                                    <option value="RPT">Pre-Canskate/Canskate - Report Card (PCS)</option>
+                                </select>
+                            </span>
+                            <span>
+                                <input type="number" name="session-amount" placeholder="Number of Sessions" required>
+                            </span>
+                            <span>
+                                <input type="date" name="date-of-session" required>
+                            </span>
+                        </div>
+                    </div>
+                    <!-- addSession() on button adds new div to add new sessions. each new session div will have a delete button that will delete the created session div -->
+                    <div id="AddSession">
+                        <input type="button" name="add-session" value = "Add Session" onclick="addSession()">
+                    </div>
+                    <div>
+                        <input type="submit" value="Submit">
+                    </div>
+                </form>
+            </div>
+    
+            <div id="summary" class="tabcontent">
+                Summary of Invoices Test
+            </div>
         </div>
-
-        <div id="summary" class="tabcontent">
-            Summary of Invoices Test
+        <div id = "fromCreate" style="display:none">
+            <div>
+                <h1>Season</h1>
+                <p>{{ result[0] }}</p>
+            </div>
+            <div>
+                <h1>Month</h1>
+                <p>{{ result[1] }}</p>
+            </div>
+            <div>
+                <h1>Name</h1>
+                <p>{{ result[2] }}</p>
+            </div>
+            <div>
+                <h1>Rate</h1>
+                <p>{{ result[3] }}</p>
+            </div>
+            <div>
+                <h1>Comments</h1>
+                <p>{{ result[4] }}</p>
+            </div>
+            <div>
+                <h1>Sessions</h1>
+                <p>{{ result[5] }}</p>
+            </div>
         </div>
+        
     </body>
 </html>
