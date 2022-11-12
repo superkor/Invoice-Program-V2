@@ -1,0 +1,12 @@
+<head>
+    <script>
+        function getURL() {
+            document.getElementById("url").innerHTML="URL sent: "+window.location.href
+        }
+    </script>
+</head>
+<body onLoad = getURL()>
+    <!-- Page if there is 400 error -->
+    <p>{{ error }}</p>
+    <p id="url"></p>
+</body>
