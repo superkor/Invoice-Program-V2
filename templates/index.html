@@ -10,6 +10,10 @@
             <h1>Invoice Program</h1>
         </header>
         <div id = "main">
+            <!-- After creating invoice, notification on successful creation will show (will provide download link to the invoice itself) -->
+            <div class = "notification" style="display:none">
+                <a id="invoice">Test</a>
+            </div>
             <div class="tab">
                 <button id = "createButton" class="tablink active" onclick="openTab(event, 'create')">Invoice Creation</button>
                 <button id = "summaryButton" class="tablink" onclick="openTab(event, 'summary')">Summary of Invoices</button>
@@ -47,7 +51,7 @@
     
                     <div id = "Comments">
                         <label for="comments">Comments</label>
-                        <textarea name="comments" id="comments" rows="4" cols="50"></textarea>
+                        <textarea name="comments" id="comments" rows="4" cols="50" style="white-space: pre-wrap"></textarea>
                     </div>
                     <div id = "List-Of-Sessions">
                         <div id = "Session1">
@@ -88,32 +92,26 @@
                 Summary of Invoices Test
             </div>
         </div>
+        <!-- Confirmation div after input for Invoice Creation -->
         <div id = "fromCreate" style="display:none">
+            <!-- Sent input data -->
+            <h1>Confirm Input</h1>
             <div>
-                <h1>Season</h1>
-                <p>{{ result[0] }}</p>
+                <h5>Season</h5>
+                <p>{{ season }}</p>
+                <h5>Month</h5>
+                <p>{{ month }}</p>
+                <h5>Name</h5>
+                <p>{{ name }}</p>
+                <h5>Rate</h5>
+                <p>{{ rate }}</p>
+                <h5>Comments</h5>
+                <p>{{ comments }}</p>
+                <h5>Sessions</h5>
+                <div id="result">{{ sessions }}</div>
             </div>
-            <div>
-                <h1>Month</h1>
-                <p>{{ result[1] }}</p>
-            </div>
-            <div>
-                <h1>Name</h1>
-                <p>{{ result[2] }}</p>
-            </div>
-            <div>
-                <h1>Rate</h1>
-                <p>{{ result[3] }}</p>
-            </div>
-            <div>
-                <h1>Comments</h1>
-                <p>{{ result[4] }}</p>
-            </div>
-            <div>
-                <h1>Sessions</h1>
-                <p>{{ result[5] }}</p>
-            </div>
-        </div>
-        
+            <input type="button" id="confirmButton" value="Confirm" onClick="createInvoice()">
+            <input type="button" id="cancelButton" value="Cancel" onClick="window.location.href='{{url_for('createInvoice')}}'">
+        </div>        
     </body>
 </html>

@@ -1,0 +1,1 @@
+{'season': '2019-2020', 'month': 'March', 'name': 'test', 'rate': '11', 'comments': 'test\r\n\r\n\r\n\r\nnew line', 'sessions': {'session0': {'type': 'PCS', 'amount': '11', 'date': '2022-11-01'}, 'session1': {'type': 'CS', 'amount': '14', 'date': '2022-11-02'}}}

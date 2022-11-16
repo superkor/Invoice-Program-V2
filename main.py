@@ -1,14 +1,13 @@
-from flask import Flask, render_template, request, abort
+from flask import Flask, abort, render_template, request, jsonify, send_file
 
 app = Flask(__name__, template_folder='templates')
-app.config['SECRET_KEY'] = 'dd1cfcfaef07bc9acd8d4d6923e9624caafae611169423ff'
 
 @app.route("/")
 def home():
-    return render_template('index.html', result = [])
+    return render_template('index.html')
 
 @app.route("/create", methods=["GET"])
-def createInvoice():
+def getInfo():
     season = request.args.get('season')
     month = request.args.get('month')
     name=request.args.get("name")
@@ -25,6 +24,8 @@ def createInvoice():
     #raise 400 if session data array doesn't have the same length
     if (numberAmount != numberSessions or numberSessions != numberDate):
         abort(400, description="Sessions has missing data "+ str({"session-type": listSessions, "sessions-amount": listSessionsAmount, "date-of-session": listSessionsDate}))
+    elif (numberAmount == 0 or numberSessions == 0 or numberDate == 0):
+        abort(400, description= "Empty query")
 
     sessions = {}
     #creating dict of sessions
@@ -34,8 +35,41 @@ def createInvoice():
     if comments == None:
         comments = ""
 
-    return render_template('index.html', result=[season,month,name,rate, comments, sessions])
+    global invoiceDict
+    invoiceDict = {
+        "season": season,
+        "month": month,
+        "name": name,
+        "rate": rate,
+        "comments": comments,
+        "sessions": sessions
+    }
+
+    return render_template('index.html', **invoiceDict)
 
 @app.errorhandler(400)
 def serverError(e):
     return render_template("400.html", error = e), 400
+
+@app.route('/createInvoice', methods=["POST"])
+def createInvoice():
+    #passes invoiceDict information to invoice creation
+    f = open("invoice/test.txt", "w")
+    f.write(str(invoiceDict))
+    f.close()
+    print(invoiceDict)
+    return jsonify({"status": "success", "invoice" : "invoice/test.txt"}), 201
+
+@app.route("/invoice/<path:filename>", methods=["GET","POST"])
+def download(filename):
+    path = "invoice\\"+filename
+    return send_file(path, as_attachment=True)
+
+def getUrl():
+    return request.url
+
+def getUrlRoot():
+    return request.url_root
+
+if __name__ == "__main__":
+    app.run(debug=True)

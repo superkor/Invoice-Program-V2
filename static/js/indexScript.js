@@ -32,22 +32,59 @@ function addMonthOptions(){
 
 function onLoad(){
     //if user clicked submit from Invoice Creation
-    if (window.location.href.includes("create")){
+    if (window.location.href.includes("/create?")){
         document.getElementById("fromCreate").setAttribute("style", "display:block")
         document.getElementById("createButton").setAttribute("class", "tablink")
         document.getElementById("create").setAttribute("style", "display:none")
         document.getElementById("main").setAttribute("style", "display:none")
+    
+        var dict = document.getElementById("result")
+        var resultDict = JSON.parse(dict.innerHTML.replaceAll("'","\""))
+        dict.innerHTML = ""
+        console.log(resultDict)
+        for (var x in resultDict){
+            var newElement = document.createElement("div")
+            for (var y in resultDict[x]){
+                var newElementSession = document.createElement("p")
+                newElementSession.setAttribute("class", y)
+                newElement.appendChild(newElementSession)
+                newElementSession.innerHTML = y + " " + resultDict[x][y]
+            }
+            dict.appendChild(newElement)
+        }
     } else{
+        //Show notification div after user created an invoice
+        if(window.location.href.includes("/?invoiceCreated")){
+            document.getElementsByClassName("notification")[0].setAttribute("style", "block")
+            document.getElementById("invoice").setAttribute("href", readCookie("invoiceFile"))
+            document.getElementById("invoice").innerHTML = "Click Here to Access the Invoice File"
+        }
+        //should allow user to create another invoice
         numSessions = 2
         addMonthOptions()
     }
+}
+
+function readCookie(name){
+    var cookieName = name + "="
+    let co = decodeURIComponent(document.cookie);
+    ca = co.split(';')
+    for (var i = 0; i < ca.length; i++){
+        var c = ca[i]
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+            }
+            if (c.indexOf(cookieName) == 0) {
+            return c.substring(cookieName.length, c.length)
+            }
+        }
+    return ""
 }
 
 function deleteSession(event){
     //gets the button that was clicked on and removes parent div
     event.target.parentNode.remove()
 }
-
 
 function addSession(){
 
@@ -146,4 +183,19 @@ function addSession(){
 
     newSession.setAttribute("id","Session"+numSessions)
     ++numSessions
+}
+
+function createInvoice(){
+    //After user clicks Confirm button on Confirm Input page an invoice will be created.
+    var request = $.ajax({
+        url: "/createInvoice",
+        type: "POST",
+        contentType: "application/json",
+        data: {},
+        success: function(response){
+            window.location.href = "/?invoiceCreated"
+            document.cookie = "invoiceFile = "+ response["invoice"]
+        }
+    }).done(function(request){
+    })
 }
