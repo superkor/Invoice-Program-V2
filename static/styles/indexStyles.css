@@ -41,3 +41,8 @@ body {font-family: Verdana;}
     -webkit-appearance: none;
     margin: 0;
   }
+
+  .notification {
+    background-color: #047cc4;
+    text-align: center;
+  }
