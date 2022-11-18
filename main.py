@@ -56,6 +56,7 @@ def serverError(e):
 def createInvoice():
     newInvoice = invoice.createInvoice(invoiceDict.get('season'), invoiceDict.get('month'), invoiceDict.get('name'), invoiceDict.get('rate'), invoiceDict.get('comments'), invoiceDict.get('sessions'))
     newInvoice.openTemplate()
+    newInvoice.fillInvoice()
     #passes invoiceDict information to invoice creation
     return jsonify({"status": "success", "invoice" : newInvoice.invoiceOutputPath}), 201
 
