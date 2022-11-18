@@ -1,4 +1,4 @@
-var numSessions;
+var numSessions, months = ["", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 function openTab(evt, tab){
     let i, tabcontent, tablink;
@@ -16,7 +16,6 @@ function openTab(evt, tab){
 
 function addMonthOptions(){
     let newMonth
-    months = ["", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
     monthSelect = document.getElementById("monthDropDown")
     for (i=0; i < 13; i++){
         newMonth = document.createElement("option")
@@ -27,6 +26,38 @@ function addMonthOptions(){
             newMonth.innerHTML = months[i]
         }
         monthSelect.appendChild(newMonth)
+    }
+}
+
+function getLastDay(month, year){
+    const date = new Date(year, month, 0)
+    let lastDay = date.getDate()
+    if (lastDay < 10){
+        lastDay = "0"+lastDay
+    }
+    return date.getDate()
+}
+
+function onChange() {
+    var monthDropDown = document.getElementById("monthDropDown")
+    var monthValue = monthDropDown.value
+    var monthSelected = months.findIndex(element => element == monthValue)
+    var season = document.getElementById("season").value
+    if (season != ""){
+        let year
+        if (monthSelected >=9){
+            year = season.split('-')[0]
+        } else {
+            year = season.split('-')[1]
+        }
+        var dateSelection = document.getElementsByClassName("dateSelection")
+        if (monthSelected < 10){
+            monthSelected = "0"+monthSelected
+        }
+        for (var i = 0; i < dateSelection.length; i++){
+            dateSelection[i].setAttribute("min",year+"-"+monthSelected+"-01")
+            dateSelection[i].setAttribute("max",year+"-"+monthSelected+"-"+getLastDay(monthSelected,year))
+        }
     }
 }
 
@@ -41,7 +72,6 @@ function onLoad(){
         var dict = document.getElementById("result")
         var resultDict = JSON.parse(dict.innerHTML.replaceAll("'","\""))
         dict.innerHTML = ""
-        console.log(resultDict)
         for (var x in resultDict){
             var newElement = document.createElement("div")
             for (var y in resultDict[x]){
@@ -179,10 +209,12 @@ function addSession(){
     dateInput.setAttribute("name","date-of-session")
     dateInput.setAttribute("type","date")
     dateInput.setAttribute("required","")
+    dateInput.setAttribute("class","dateSelection")
     dateSpan.appendChild(dateInput)
 
     newSession.setAttribute("id","Session"+numSessions)
     ++numSessions
+    onChange()
 }
 
 function createInvoice(){
@@ -196,6 +228,5 @@ function createInvoice(){
             window.location.href = "/?invoiceCreated"
             document.cookie = "invoiceFile = "+ response["invoice"]
         }
-    }).done(function(request){
-    })
+    }).done()
 }
