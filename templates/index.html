@@ -26,7 +26,7 @@
                         <label for="season">Season</label>
                         <!-- Will add a function to populate seasons based on what invoice template exists -->
                         <select name = "season" required id = "season" onchange="onChange()">
-                            <option value ="">Select a season</option>
+                            <option value ="" selected disabed hidden>Select a season</option>
                             <option value = "2019-2020">2019-2020</option>
                             <option value = "2020-2021">2020-2021</option>
                             <option value = "2021-2022">2021-2022</option>
@@ -58,15 +58,17 @@
                                 <select name = "session-type" required>
                                     <option value="" selected disabled hidden>Select Session</option>
                                     <option value="PCS">Pre-Canskate (PCS)</option>
-                                    <option value="CS">Canskate (CS)</option>
-                                    <option value="FZ">Fun Zone (FZ)</option>
-                                    <option value="NV">Novice (NV)</option>
+                                    <option value="CS" >Canskate (CS)</option>
+                                    <option value="FZ" class = "FZ">Fun Zone (FZ)</option>
+                                    <option value="IN" class = "IN" disabled hidden>Intermediate (IN)</option>
+                                    <option value="NV" class = "NV">Novice (NV)</option>
+                                    <option value="JR" class = "JR">Junior (JR)</option>
                                     <option value="PEP">PEP</option>
                                     <option value="AD">Adult (AD)</option>
                                     <option value="PW">Power (PW)</option>
                                     <option value="ST">Stroking (ST)</option>
-                                    <option value="CIR">Canskate - Circuit Drawing (CIR)</option>
-                                    <option value="RPT">Pre-Canskate/Canskate - Report Card (PCS)</option>
+                                    <option value="CIR" class = "CIR">Canskate - Circuit Drawing (CIR)</option>
+                                    <option value="RPT" class = "RPT">Pre-Canskate/Canskate - Report Card (RPT)</option>
                                 </select>
                             </span>
                             <span>

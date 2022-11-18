@@ -59,6 +59,49 @@ function onChange() {
             dateSelection[i].setAttribute("max",year+"-"+monthSelected+"-"+getLastDay(monthSelected,year))
         }
     }
+
+    //update sessions
+    var inSession, nvSession, jrSession, cirSession, rptSession, fzSession
+
+    inSession = document.getElementsByClassName("IN")
+    nvSession = document.getElementsByClassName("NV")
+    jrSession = document.getElementsByClassName("JR")
+    cirSession = document.getElementsByClassName("CIR")
+    rptSession = document.getElementsByClassName("RPT")
+    fzSession = document.getElementsByClassName("FZ")
+
+    if (season == "2022-2023"){
+        for (var i = 0; i < numSessions; i++){
+            inSession[i].setAttribute("disabled","")
+            inSession[i].setAttribute("hidden","")
+            nvSession[i].removeAttribute("disabled","")
+            nvSession[i].removeAttribute("hidden","")
+            jrSession[i].removeAttribute("disabled","")
+            jrSession[i].removeAttribute("hidden","")
+            cirSession[i].removeAttribute("disabled","")
+            cirSession[i].removeAttribute("hidden","")
+            rptSession[i].removeAttribute("disabled","")
+            rptSession[i].removeAttribute("hidden","")
+            fzSession[i].removeAttribute("disabled","")
+            fzSession[i].removeAttribute("hidden","")
+        }
+    } else {
+        for (var i = 0; i < numSessions; i++){
+            inSession[i].removeAttribute("disabled","")
+            inSession[i].removeAttribute("hidden","")
+            nvSession[i].setAttribute("disabled","")
+            nvSession[i].setAttribute("hidden","")
+            jrSession[i].setAttribute("disabled","")
+            jrSession[i].setAttribute("hidden","")
+            cirSession[i].setAttribute("disabled","")
+            cirSession[i].setAttribute("hidden","")
+            rptSession[i].setAttribute("disabled","")
+            rptSession[i].setAttribute("hidden","")
+            fzSession[i].setAttribute("disabled","")
+            fzSession[i].setAttribute("hidden","")
+        }
+    }
+
 }
 
 function onLoad(){
@@ -90,7 +133,7 @@ function onLoad(){
             document.getElementById("invoice").innerHTML = "Click Here to Access the Invoice File"
         }
         //should allow user to create another invoice
-        numSessions = 2
+        numSessions = 1
         addMonthOptions()
     }
 }
@@ -150,8 +193,16 @@ function addSession(){
             "value": "Fun Zone (FZ)"
         },
 
+        "IN":{
+            "value": "Intermediate (IN)"
+        },
+
         "NV": {
             "value": "Novice (NV)"
+        },
+
+        "JR": {
+            "value": "Junior (JR)"
         },
 
         "PEP": {
@@ -192,12 +243,15 @@ function addSession(){
             dropDown.setAttribute("value", "")
         } else {
             dropDown.setAttribute("value", key)
+            if (key == "IN" || key == "NV" || key == "JR" || key == "CIR" || key == "RPT" || key == "FZ"){
+                dropDown.setAttribute("class", key)
+            }
         }
         dropDown.innerHTML = value.value
         dropDownSelect.appendChild(dropDown)
-        
+ 
     }
-    
+
     numInput = document.createElement("input")
     numInput.setAttribute("name","session-amount")
     numInput.setAttribute("type","number")
