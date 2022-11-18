@@ -3,3 +3,4 @@ venv
 layout.png
 __pycache__
 jquery.js
+invoice/output/*
