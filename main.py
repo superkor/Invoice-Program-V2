@@ -1,4 +1,5 @@
 from flask import Flask, abort, render_template, request, jsonify, send_file
+import static.python.invoiceCreation as invoice
 
 app = Flask(__name__, template_folder='templates')
 
@@ -53,12 +54,10 @@ def serverError(e):
 
 @app.route('/createInvoice', methods=["POST"])
 def createInvoice():
+    newInvoice = invoice.createInvoice(invoiceDict.get('season'), invoiceDict.get('month'), invoiceDict.get('name'), invoiceDict.get('rate'), invoiceDict.get('comments'), invoiceDict.get('sessions'))
+    newInvoice.openTemplate()
     #passes invoiceDict information to invoice creation
-    f = open("invoice/test.txt", "w")
-    f.write(str(invoiceDict))
-    f.close()
-    print(invoiceDict)
-    return jsonify({"status": "success", "invoice" : "invoice/test.txt"}), 201
+    return jsonify({"status": "success", "invoice" : newInvoice.invoiceOutputPath}), 201
 
 @app.route("/invoice/<path:filename>", methods=["GET","POST"])
 def download(filename):
