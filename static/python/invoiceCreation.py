@@ -42,7 +42,6 @@ class createInvoice:
         self.rate = rate
         self.comments = comments
         self.sessions = sessions
-        print(self.sessions)
 
     """
     Gets year in the season based on month
@@ -192,7 +191,7 @@ class createInvoice:
             elif colIndex == 0:
                 wb["B10"] = sessionText
 
-        #if first day is on a saturday, set next day to be next element in list. otherwise, go back to the first element
+        #if first day is not on a saturday, set next day to be next element in list. otherwise, go back to the first element
         if (colIndex != 6):
             colIndex +=1
             rowIndex = 0
