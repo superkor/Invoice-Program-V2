@@ -281,6 +281,9 @@ function createInvoice(){
         success: function(response){
             window.location.href = "/?invoiceCreated"
             document.cookie = "invoiceFile = "+ response["invoice"]
+        },
+        error: function(response){
+            alert(response["error"])
         }
     }).done()
 }

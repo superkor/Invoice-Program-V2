@@ -54,11 +54,14 @@ def serverError(e):
 
 @app.route('/createInvoice', methods=["POST"])
 def createInvoice():
-    newInvoice = invoice.createInvoice(invoiceDict.get('season'), invoiceDict.get('month'), invoiceDict.get('name'), invoiceDict.get('rate'), invoiceDict.get('comments'), invoiceDict.get('sessions'))
-    newInvoice.openTemplate()
-    newInvoice.fillInvoice()
-    #passes invoiceDict information to invoice creation
-    return jsonify({"status": "success", "invoice" : newInvoice.invoiceOutputPath}), 201
+    try:
+        newInvoice = invoice.createInvoice(invoiceDict.get('season'), invoiceDict.get('month'), invoiceDict.get('name'), invoiceDict.get('rate'), invoiceDict.get('comments'), invoiceDict.get('sessions'))
+        newInvoice.openTemplate()
+        newInvoice.fillInvoice()
+        #passes invoiceDict information to invoice creation
+        return jsonify({"success": "true", "invoice" : newInvoice.invoiceOutputPath}), 201
+    except Exception as e:
+        return jsonify({"success": "false", "error": str(e)}), 500
 
 @app.route("/invoice/<path:filename>", methods=["GET","POST"])
 def download(filename):
