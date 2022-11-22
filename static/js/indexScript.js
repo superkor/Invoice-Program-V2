@@ -23,7 +23,7 @@ function openTab(evt, tab){
             success: function(response){
                 document.getElementById("summary").innerHTML = response["invoiceTable"]
             },
-            error: function(response){
+            error: function(error){
                 alert("server error "+ error.status + ": " + error.responseJSON.error)
             }
         }).done()
