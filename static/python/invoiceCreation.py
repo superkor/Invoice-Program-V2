@@ -44,6 +44,12 @@ class createInvoice:
         self.sessions = sessions
 
     """
+    Returns invoice output path (string)
+    """
+    def getInvoiceOutputPath(self):
+        return self.invoiceOutputPath
+
+    """
     Gets year in the season based on month
     """
     def getYear(self):
