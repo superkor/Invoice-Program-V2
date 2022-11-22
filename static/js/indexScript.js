@@ -12,6 +12,22 @@ function openTab(evt, tab){
     }
     document.getElementById(tab).style.display = "block";
     evt.currentTarget.className += " active";
+
+    if (tab == "summary"){
+        //After user clicks Confirm button on Confirm Input page an invoice will be created.
+        var request = $.ajax({
+            url: "/summaryInvoice",
+            type: "GET",
+            contentType: "application/json",
+            data: {},
+            success: function(response){
+                document.getElementById("summary").innerHTML = response["invoiceTable"]
+            },
+            error: function(response){
+                alert("server error "+ error.status + ": " + error.responseJSON.error)
+            }
+        }).done()
+    }
 }
 
 function addMonthOptions(){
@@ -282,8 +298,8 @@ function createInvoice(){
             window.location.href = "/?invoiceCreated"
             document.cookie = "invoiceFile = "+ response["invoice"]
         },
-        error: function(response){
-            alert(response["error"])
+        error: function(error){
+            alert("server error "+ error.status + ": " + error.responseJSON.error)
         }
     }).done()
 }

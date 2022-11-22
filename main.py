@@ -60,7 +60,9 @@ def createInvoice():
         newInvoice.openTemplate()
         newInvoice.fillInvoice()
         #passes invoiceDict information to invoice creation
-        return jsonify({"success": "true", "invoice" : newInvoice.invoiceOutputPath}), 201
+        newInvoiceDB = summary.summaryInvoice()
+        newInvoiceDB.insertNewInvoice(invoiceDict.get('season'), invoiceDict.get('month'), newInvoice.getInvoiceOutputPath())
+        return jsonify({"success": "true", "invoice" : newInvoice.getInvoiceOutputPath()}), 201
     except Exception as e:
         return jsonify({"success": "false", "error": str(e)}), 500
 
@@ -74,6 +76,17 @@ def getUrl():
 
 def getUrlRoot():
     return request.url_root
+
+@app.route("/summaryInvoice", methods=["GET"])
+def summaryInvoice():
+    try:
+        newInvoiceDB = summary.summaryInvoice()
+        table = newInvoiceDB.showTable()
+        #convert nested list duple to list
+        table = list(table[0])
+        return jsonify({"success":"true", "invoiceTable": table})
+    except Exception as e:
+        return jsonify({"success": "false", "error": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(debug=True)
