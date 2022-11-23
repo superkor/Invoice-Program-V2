@@ -36,12 +36,18 @@ function summaryInvoice(invoiceTable){
     document.getElementById("summary").textContent = ""
     //List all created invoices from list_invoice table
     for (x in invoiceTable){
-        newRow = document.createElement("div")
+        newRow = document.createElement("a")
+        newDiv = document.createElement("div")
+        document.getElementById("summary").appendChild(newDiv)
         newRow.setAttribute("class", "invoiceRow")
         for (y in invoiceTable[x]){
-            newRow.innerHTML += " " + invoiceTable[x][y]
+            if (y != 2){
+                newRow.innerHTML += " " + invoiceTable[x][y]
+            } else {
+                newRow.setAttribute("href", invoiceTable[x][y])
+            }
         }
-        document.getElementById("summary").appendChild(newRow)
+        newDiv.appendChild(newRow)
     }
 }
 
