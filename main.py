@@ -4,6 +4,12 @@ import static.python.invoiceSummary as summary
 
 app = Flask(__name__, template_folder='templates')
 
+"""
+TODO
+- Add check when creating invoice for a season and month that already exists
+- Add update/edit function for an existing invoice
+"""
+
 @app.route("/")
 def home():
     return render_template('index.html')
@@ -62,6 +68,7 @@ def createInvoice():
         #passes invoiceDict information to invoice creation
         newInvoiceDB = summary.summaryInvoice()
         newInvoiceDB.insertNewInvoice(invoiceDict.get('season'), invoiceDict.get('month'), newInvoice.getInvoiceOutputPath())
+        newInvoiceDB.fillSeasonTable(invoiceDict.get('season'), invoiceDict.get('month'), invoiceDict.get('sessions'))
         return jsonify({"success": "true", "invoice" : newInvoice.getInvoiceOutputPath()}), 201
     except Exception as e:
         return jsonify({"success": "false", "error": str(e)}), 500
@@ -82,8 +89,6 @@ def summaryInvoice():
     try:
         newInvoiceDB = summary.summaryInvoice()
         table = newInvoiceDB.showTable()
-        #convert nested list duple to list
-        table = list(table[0])
         return jsonify({"success":"true", "invoiceTable": table})
     except Exception as e:
         return jsonify({"success": "false", "error": str(e)}), 500
