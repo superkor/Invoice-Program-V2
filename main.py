@@ -67,6 +67,7 @@ def createInvoice():
         newInvoice.fillInvoice()
         #passes invoiceDict information to invoice creation
         newInvoiceDB = summary.summaryInvoice()
+        newInvoiceDB.createSeasonTable(invoiceDict.get('season'))
         newInvoiceDB.insertNewInvoice(invoiceDict.get('season'), invoiceDict.get('month'), newInvoice.getInvoiceOutputPath())
         newInvoiceDB.fillSeasonTable(invoiceDict.get('season'), invoiceDict.get('month'), invoiceDict.get('sessions'))
         return jsonify({"success": "true", "invoice" : newInvoice.getInvoiceOutputPath()}), 201

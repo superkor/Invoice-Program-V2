@@ -43,8 +43,6 @@ class summaryInvoice:
         except mysql.connector.Error as err:
             raise err
 
-
-
     """
     Creates a new row into the list_invoice table. 
     Arguments:
@@ -73,7 +71,6 @@ class summaryInvoice:
             """
             self.mycursor.execute("use invoices")
             self.mycursor.execute(selectRow, (season, month))
-            #print(self.mycursor.fetchall())
             return self.mycursor.fetchall()
         except mysql.connector.Error as err:
             raise err
@@ -101,8 +98,8 @@ class summaryInvoice:
             SELECT COUNT(TABLE_NAME) FROM information_schema.TABLES WHERE TABLE_NAME = ''%s'' AND TABLE_SCHEMA LIKE 'invoices';
             """
             self.mycursor.execute(selectTable, (season,))
-            num = self.mycursor.fetchall()
-            if num[0][0] == 0:
+            num = self.mycursor.fetchone()
+            if num[0] == 0:
                 createTable = """
                     CREATE TABLE `%s` (months varchar(255), PCS int, CS int, FZ int, NV int, JR int, PEP int, AD int, PW int, ST int, CIR int, RPT int, INTER int)
                 """
@@ -121,7 +118,6 @@ class summaryInvoice:
         try:
             if not self.checkIfRecordExists(season, 1, months):
                 self.mycursor.execute("USE invoices")
-                self.createSeasonTable(season)
                 insertIntoTable = """
                 INSERT INTO `%s` VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)   
                 """
@@ -155,13 +151,42 @@ class summaryInvoice:
                         inter+=int(sessions[f"session{x}"]["amount"])
                 self.mycursor.execute(insertIntoTable, (season, months, pcs, cs, fz, nv, jr, pep, ad, pw, st, cir, rpt, inter))
                 self.mydb.commit() 
+            #if month is already in table
+            else:
+                self.mycursor.execute("USE invoices")
+                insertIntoTable = """
+                UPDATE `%s` SET PCS = %s, CS = %s, FZ = %s, NV = %s, JR = %s, PEP = %s, AD = %s, PW = %s, ST = %s, CIR = %s, RPT = %s, INTER = %s WHERE months = %s   
+                """
+                pcs = cs = fz = nv = jr = pep = ad = pw = st = cir = rpt = inter = 0
+
+                numberSessions = len(sessions)
+                for x in range(numberSessions):
+                    if sessions[f"session{x}"]["type"] == "PCS":
+                        pcs+=int(sessions[f"session{x}"]["amount"])
+                    elif sessions[f"session{x}"]["type"] == "CS":
+                        cs+=int(sessions[f"session{x}"]["amount"])
+                    elif sessions[f"session{x}"]["type"] == "FZ":
+                        fz+=int(sessions[f"session{x}"]["amount"])
+                    elif sessions[f"session{x}"]["type"] == "NV":
+                        nv+=int(sessions[f"session{x}"]["amount"])
+                    elif sessions[f"session{x}"]["type"] == "JR":
+                        jr+=int(sessions[f"session{x}"]["amount"])
+                    elif sessions[f"session{x}"]["type"] == "PEP":
+                        pep+=int(sessions[f"session{x}"]["amount"])
+                    elif sessions[f"session{x}"]["type"] == "AD":
+                        ad+=int(sessions[f"session{x}"]["amount"])
+                    elif sessions[f"session{x}"]["type"] == "PW":
+                        pw+=int(sessions[f"session{x}"]["amount"])
+                    elif sessions[f"session{x}"]["type"] == "ST":
+                        st+=int(sessions[f"session{x}"]["amount"])
+                    elif sessions[f"session{x}"]["type"] == "CIR":
+                        cir+=int(sessions[f"session{x}"]["amount"])
+                    elif sessions[f"session{x}"]["type"] == "RPT":
+                        rpt+=int(sessions[f"session{x}"]["amount"])
+                    elif sessions[f"session{x}"]["type"] == "IN":
+                        inter+=int(sessions[f"session{x}"]["amount"])
+                self.mycursor.execute(insertIntoTable, (season, pcs, cs, fz, nv, jr, pep, ad, pw, st, cir, rpt, inter, months))
+                self.mydb.commit() 
             
         except mysql.connector.Error as err:
             raise err
-
-if __name__ == "__main__":
-    sql = summaryInvoice()
-    #sql.insertNewInvoice("2019-2020", "December", "link2")
-    test = sql.getInvoiceLink("2019-2020", "November")
-    sql.showTable()
-    print(test[0][0])
