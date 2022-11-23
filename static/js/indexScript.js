@@ -21,12 +21,27 @@ function openTab(evt, tab){
             contentType: "application/json",
             data: {},
             success: function(response){
-                document.getElementById("summary").innerHTML = response["invoiceTable"]
+               summaryInvoice(response["invoiceTable"])
             },
             error: function(error){
                 alert("server error "+ error.status + ": " + error.responseJSON.error)
             }
         }).done()
+    }
+}
+
+function summaryInvoice(invoiceTable){
+    console.log(invoiceTable)
+    //Clear child nodes
+    document.getElementById("summary").textContent = ""
+    //List all created invoices from list_invoice table
+    for (x in invoiceTable){
+        newRow = document.createElement("div")
+        newRow.setAttribute("class", "invoiceRow")
+        for (y in invoiceTable[x]){
+            newRow.innerHTML += " " + invoiceTable[x][y]
+        }
+        document.getElementById("summary").appendChild(newRow)
     }
 }
 
