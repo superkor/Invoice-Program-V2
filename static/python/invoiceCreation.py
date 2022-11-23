@@ -1,4 +1,3 @@
-import openpyxl as invoice
 from openpyxl import load_workbook
 import shutil
 import datetime as date
@@ -7,20 +6,6 @@ class createInvoice:
     invoiceTemplatePath = "././invoice/template"
     invoiceOutputPath = "././invoice/output"
     monthArray = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-    sessionMins = {
-        "PCS": 50,
-        "CS": 30,
-        "IN": 10,
-        "PEP": 30,
-        "AD": 50,
-        "PW": 60,
-        "ST": 10,
-        "FZ": 15,
-        "NV": 10,
-        "JR": 15,
-        "CIR": 5,
-        "RPT": 10
-    }
     pcs = 0
     cs = 0
     fz = 0
@@ -35,7 +20,7 @@ class createInvoice:
     inter = 0
     year = 0
 
-    def __init__(self, season, month, name, rate, comments, sessions):
+    def __init__(self, season: str, month: str, name: str, rate: str, comments: str, sessions: dict):
         self.season = season
         self.month = month
         self.name = name
@@ -246,7 +231,7 @@ class createInvoice:
         firstDay (int) - first day of the month
         wb (openpyxl object) - calendar spreadsheet
     """
-    def setFirstDay(self, firstDay,wb):
+    def setFirstDay(self, firstDay: int, wb):
         if firstDay == 0:
             wb["C9"] = 1
             return 1
@@ -280,7 +265,7 @@ class createInvoice:
     Arguments:
         day (int) - day of the month
     """
-    def getSessionOnDay(self, day):
+    def getSessionOnDay(self, day: int):
         numberSessions = len(self.sessions)
         exportDict = {}
         for x in range(numberSessions):
