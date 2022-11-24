@@ -85,6 +85,26 @@ class summaryInvoice:
             return self.mycursor.fetchall()
         except mysql.connector.Error as err:
             raise err
+
+    """
+    Returns Season Table
+    Arguments:
+    season: string (up to 255 characters)
+    """
+    def getSeasonTable(self, season: str):
+        try:
+            self.mycursor.execute("USE invoices")
+            selectTable = """
+            SELECT * FROM `%s`
+            """
+            self.mycursor.execute(selectTable, (season,))
+            result = self.mycursor.fetchone()
+            if not result:
+                return ""
+            else:
+                return result
+        except mysql.connector.Error as err:
+            raise err
     
     """
     Creates table per season to store session data and total amount.
