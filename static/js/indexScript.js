@@ -85,7 +85,11 @@ function addSeasonTable(season,x){
         data: {},
         success: function(response){
             table = response["seasonTable"]
-          document.getElementsByClassName("seasonTable")[x].innerHTML = table
+            console.log(table)
+            document.getElementsByClassName("seasonTable")[x].innerHTML = "Month,pcs, cs, fz, nv, jr, pep, ad, pw, st, cir, rpt, inter <br>"
+            for (y in table){
+                document.getElementsByClassName("seasonTable")[x].innerHTML += table[y] + "<br>"
+            }
         },
         error: function(error){
             alert("server error "+ error.status + ": " + error.responseJSON.error)

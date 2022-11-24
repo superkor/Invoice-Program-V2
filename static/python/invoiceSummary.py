@@ -98,9 +98,9 @@ class summaryInvoice:
             SELECT * FROM `%s`
             """
             self.mycursor.execute(selectTable, (season,))
-            result = self.mycursor.fetchone()
-            if not result:
-                return ""
+            result = self.mycursor.fetchall()
+            if len(result) == 0:
+                return [""]
             else:
                 return result
         except mysql.connector.Error as err:
