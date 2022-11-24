@@ -94,5 +94,16 @@ def summaryInvoice():
     except Exception as e:
         return jsonify({"success": "false", "error": str(e)}), 500
 
+@app.route("/getInvoice", methods=["GET"])
+def getInvoice():
+    try:
+        season = request.headers["season"]
+        newInvoiceDB = summary.summaryInvoice()
+        table = newInvoiceDB.getSeasonTable(season)
+        return jsonify({"success":"true", "seasonTable": table})
+    except Exception as e:
+        return jsonify({"success": "false", "error": str(e)}), 500
+
+
 if __name__ == "__main__":
     app.run(debug=True)

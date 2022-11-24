@@ -30,25 +30,68 @@ function openTab(evt, tab){
     }
 }
 
+function seasonDropDown(elm){
+    x = document.getElementsByClassName("seasonDropdown")
+    for (var i = 0; i < x.length; i++){
+        if (x[i].classList.contains("show")){
+            x[i].classList.toggle("show")
+        }
+    }
+    document.getElementById(elm).classList.toggle("show")
+    var seasonArray = ["2019-2020","2020-2021","2021-2022","2022-2023"]
+    addSeasonTable(elm,seasonArray.indexOf(elm))
+}
+
 function summaryInvoice(invoiceTable){
     console.log(invoiceTable)
-    //Clear child nodes
-    document.getElementById("summary").textContent = ""
+    div = document.getElementsByClassName("monthInformation")
+    for (y in div){
+        div[y].textContent = ""
+    }
     //List all created invoices from list_invoice table
     for (x in invoiceTable){
         newRow = document.createElement("a")
-        newDiv = document.createElement("div")
-        document.getElementById("summary").appendChild(newDiv)
         newRow.setAttribute("class", "invoiceRow")
         for (y in invoiceTable[x]){
+            checkSeason(invoiceTable[x][0], div[x])
             if (y != 2){
                 newRow.innerHTML += " " + invoiceTable[x][y]
             } else {
                 newRow.setAttribute("href", invoiceTable[x][y])
             }
         }
-        newDiv.appendChild(newRow)
+        div[x].appendChild(newRow)
     }
+}
+
+function checkSeason(season, newDiv){
+    if (season == "2019-2020"){
+        document.getElementById("2019-2020").appendChild(newDiv)
+    } else if (season == "2020-2021"){
+        document.getElementById("2020-2021").appendChild(newDiv)
+    } else if (season == "2021-2022"){
+        document.getElementById("2021-2022").appendChild(newDiv)
+    } else if (season == "2022-2023"){
+        document.getElementById("2022-2023").appendChild(newDiv)
+    }
+}
+
+function addSeasonTable(season,x){
+    var request = $.ajax({
+        url: "/getInvoice",
+        type: "GET",
+        headers: {"season": season},
+        contentType: "application/json",
+        data: {},
+        success: function(response){
+            table = response["seasonTable"]
+          document.getElementsByClassName("seasonTable")[x].innerHTML = table
+        },
+        error: function(error){
+            alert("server error "+ error.status + ": " + error.responseJSON.error)
+        }
+    }).done()
+    
 }
 
 function addMonthOptions(){

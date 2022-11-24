@@ -46,3 +46,36 @@ body {font-family: Verdana;}
     background-color: #047cc4;
     text-align: center;
   }
+
+  .dropdownbtn {
+    background-color: #3498DB;
+    color: white;
+    padding: 16px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+  }
+
+  .dropdownbtn:hover, .dropdownbtn:focus {
+    background-color: #2980B9;
+  }
+
+  .seasonDropdown{
+    display: none;
+    position: absolute;
+    background-color: #f1f1f1;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+  }
+
+  .invoiceRow {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+  }
+
+  .seasonDropdown-content a:hover {background-color: #ddd;}
+
+  .show{display:block;}
