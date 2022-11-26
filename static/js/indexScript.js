@@ -85,13 +85,28 @@ function addSeasonTable(season,x){
         data: {},
         success: function(response){
             table = response["seasonTable"]
-            console.log(table)
-            document.getElementsByClassName("seasonTable")[x].innerHTML = "Month, pcs, cs, fz, nv, jr, pep, ad, pw, st, cir, rpt, inter <br>"
             if (table == 0){
-                document.getElementsByClassName("seasonTable")[x].innerHTML += "No invoices found for this season"
+                document.getElementsByClassName("seasonTable")[x].innerHTML = "<br>No invoices found for this season"
             } else {
+                headerRow = ['Month', 'pcs', 'cs', 'fz', 'nv', 'jr', 'pep', 'ad', 'pw', 'st', 'cir', 'rpt', 'inter']
+                document.getElementsByClassName("seasonTable")[x].textContent = ""
+                seasonTable = document.createElement("table")
+                document.getElementsByClassName("seasonTable")[x].appendChild(seasonTable)
+                tr = document.createElement("tr")
+                seasonTable.appendChild(tr)
+                for (var m = 0; m < 13; m ++){
+                    th = document.createElement("th")
+                    tr.appendChild(th)
+                    th.innerHTML = headerRow[m]   
+                }
                 for (y in table){
-                    document.getElementsByClassName("seasonTable")[x].innerHTML += table[y] + "<br>"
+                    tr = document.createElement("tr")
+                    seasonTable.appendChild(tr)
+                    for (w in table[y]){
+                        td = document.createElement("td")
+                        tr.appendChild(td)
+                        td.innerHTML = table[y][w]
+                    }
                 }
             }
         },
