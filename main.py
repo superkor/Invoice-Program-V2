@@ -1,6 +1,7 @@
 from flask import Flask, abort, render_template, request, jsonify, send_file
 import static.python.invoiceCreation as invoice
 import static.python.invoiceSummary as summary
+from mysql.connector import errorcode
 
 app = Flask(__name__, template_folder='templates')
 
@@ -90,7 +91,7 @@ def summaryInvoice():
     try:
         newInvoiceDB = summary.summaryInvoice()
         table = newInvoiceDB.showTable()
-        return jsonify({"success":"true", "invoiceTable": table})
+        return jsonify({"success":"true", "invoiceTable": table}), 200
     except Exception as e:
         return jsonify({"success": "false", "error": str(e)}), 500
 
@@ -102,7 +103,10 @@ def getInvoice():
         table = newInvoiceDB.getSeasonTable(season)
         return jsonify({"success":"true", "seasonTable": table})
     except Exception as e:
-        return jsonify({"success": "false", "error": str(e)}), 500
+        if e.errno == errorcode.ER_NO_SUCH_TABLE:
+            return jsonify({"success": "true", "seasonTable": 0}), 200
+        else:
+            return jsonify({"success": "false", "error": str(e)}), 500
 
 
 if __name__ == "__main__":

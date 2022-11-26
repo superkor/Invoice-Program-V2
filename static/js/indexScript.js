@@ -86,9 +86,13 @@ function addSeasonTable(season,x){
         success: function(response){
             table = response["seasonTable"]
             console.log(table)
-            document.getElementsByClassName("seasonTable")[x].innerHTML = "Month,pcs, cs, fz, nv, jr, pep, ad, pw, st, cir, rpt, inter <br>"
-            for (y in table){
-                document.getElementsByClassName("seasonTable")[x].innerHTML += table[y] + "<br>"
+            document.getElementsByClassName("seasonTable")[x].innerHTML = "Month, pcs, cs, fz, nv, jr, pep, ad, pw, st, cir, rpt, inter <br>"
+            if (table == 0){
+                document.getElementsByClassName("seasonTable")[x].innerHTML += "No invoices found for this season"
+            } else {
+                for (y in table){
+                    document.getElementsByClassName("seasonTable")[x].innerHTML += table[y] + "<br>"
+                }
             }
         },
         error: function(error){
