@@ -1,4 +1,5 @@
 import mysql.connector
+from mysql.connector import errorcode
 
 class summaryInvoice:
     def __init__(self):
