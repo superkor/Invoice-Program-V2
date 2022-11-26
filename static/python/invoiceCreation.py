@@ -258,7 +258,10 @@ class createInvoice:
     Gets the last day of the month
     """
     def getLastDay(self):
-        return (date.date(int(self.year), self.monthArray.index(self.month)+2, 1) - date.timedelta(days=1)).day
+        if (self.monthArray.index(self.month)+2 > 12):
+            return (date.date(int(self.year), 1, 1) - date.timedelta(days=1)).day
+        else:
+            return (date.date(int(self.year), self.monthArray.index(self.month)+2, 1) - date.timedelta(days=1)).day
     
     """
     Gets what session has been done on the day given.
