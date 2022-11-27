@@ -1,4 +1,23 @@
-var numSessions, months = ["", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+var numSessions, months = ["", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+headerRow = ['Month', 'PreCanskate (PCS)', 'Canskate (CS)', 'Funzone (FZ)', 'Novice (NV)', 'Junior (JR)', 'Performance Enrichment Program (PEP)', 'Adult (AD)', 
+                'Power Skate (PW)', 'Stroking (ST)', 'Canskate - Circuit Drawing (CIR)', 'Pre-Canskate/Canskate - Report Card (RPT)', 'Intermediate (IN)', 'Hours']
+var seasonArray = ["2019-2020","2020-2021","2021-2022","2022-2023"]
+
+//vars for sorting by header; 0 for high to low (month will be sorted in normal order), 1 for sort by low to high (month has no option for 1)
+var mo = 0
+var pcs = 0
+var cs = 0
+var fz = 0
+var nv = 0
+var jr = 0
+var pep = 0
+var ad = 0
+var pw = 0
+var st = 0
+var cir = 0
+var rpt = 0
+var inter = 0
+var hr = 0
 
 function openTab(evt, tab){
     let i, tabcontent, tablink;
@@ -31,6 +50,20 @@ function openTab(evt, tab){
 }
 
 function seasonDropDown(elm){
+    //Reset sort
+    mo = 0
+    pcs = 0
+    cs = 0
+    fz = 0
+    nv = 0
+    jr = 0
+    pep = 0
+    ad = 0
+    pw = 0
+    st = 0
+    cir = 0
+    rpt = 0
+    inter = 0
     x = document.getElementsByClassName("seasonDropdown")
     for (var i = 0; i < x.length; i++){
         if (x[i].classList.contains("show")){
@@ -38,7 +71,6 @@ function seasonDropDown(elm){
         }
     }
     document.getElementById(elm).classList.toggle("show")
-    var seasonArray = ["2019-2020","2020-2021","2021-2022","2022-2023"]
     addSeasonTable(elm,seasonArray.indexOf(elm))
 }
 
@@ -88,16 +120,16 @@ function addSeasonTable(season,x){
             if (table == 0){
                 document.getElementsByClassName("seasonTable")[x].innerHTML = "<br>No invoices found for this season"
             } else {
-                headerRow = ['Month', 'pcs', 'cs', 'fz', 'nv', 'jr', 'pep', 'ad', 'pw', 'st', 'cir', 'rpt', 'inter']
                 document.getElementsByClassName("seasonTable")[x].textContent = ""
                 seasonTable = document.createElement("table")
                 document.getElementsByClassName("seasonTable")[x].appendChild(seasonTable)
                 tr = document.createElement("tr")
                 seasonTable.appendChild(tr)
-                for (var m = 0; m < 13; m ++){
+                for (var m = 0; m < headerRow.length; m ++){
                     th = document.createElement("th")
+                    th.setAttribute("onclick", "sortBasedOnHeader('"+headerRow[m]+"', '"+ season + "')")
                     tr.appendChild(th)
-                    th.innerHTML = headerRow[m]   
+                    th.innerHTML = headerRow[m]
                 }
                 for (y in table){
                     tr = document.createElement("tr")
@@ -115,6 +147,406 @@ function addSeasonTable(season,x){
         }
     }).done()
     
+}
+
+function sortBasedOnHeader(header, season){
+    sort = {header: "", order: ""}
+    switch (header){
+        case "Month":
+            if(!mo){
+                sort["header"] = "MONTH"
+                sort["order"] = "DESC"
+                mo = 1
+                pcs = 0
+                cs = 0
+                fz = 0
+                nv = 0
+                jr = 0
+                pep = 0
+                ad = 0
+                pw = 0
+                st = 0
+                cir = 0
+                rpt = 0
+                inter = 0
+                hr = 0
+            }
+            else{
+                sort["header"] = "MONTH"
+                sort["order"] = "ASC"
+                mo = 0
+            }
+            break
+        case 'PreCanskate (PCS)':
+            if (!pcs){
+                sort["header"] = "PCS"
+                sort["order"] = "DESC"
+                pcs = 1
+                mo = 0
+                cs = 0
+                fz = 0
+                nv = 0
+                jr = 0
+                pep = 0
+                ad = 0
+                pw = 0
+                st = 0
+                cir = 0
+                rpt = 0
+                inter = 0
+                hr = 0
+            }
+            else{
+                sort["header"] = "PCS"
+                sort["order"] = "ASC"
+                pcs = 0
+            }
+            break
+        case 'Canskate (CS)':
+            if (!cs){
+                sort["header"] = "CS"
+                sort["order"] = "DESC"
+                cs = 1
+                pcs = 0
+                mo = 0
+                fz = 0
+                nv = 0
+                jr = 0
+                pep = 0
+                ad = 0
+                pw = 0
+                st = 0
+                cir = 0
+                rpt = 0
+                inter = 0
+                hr = 0
+            }
+            else{
+                sort["header"] = "CS"
+                sort["order"] = "ASC"
+                cs = 0
+            }
+            break
+        case 'Funzone (FZ)':
+            if (!fz){
+                sort["header"] = "FZ"
+                sort["order"] = "DESC"
+                fz = 1
+                pcs = 0
+                cs = 0
+                mo = 0
+                nv = 0
+                jr = 0
+                pep = 0
+                ad = 0
+                pw = 0
+                st = 0
+                cir = 0
+                rpt = 0
+                inter = 0
+                hr = 0
+            }
+            else{
+                sort["header"] = "FZ"
+                sort["order"] = "ASC"
+                fz = 0
+            }
+            break
+        case 'Novice (NV)':
+            if (!nv){
+                sort["header"] = "NV"
+                sort["order"] = "DESC"
+                nv = 1
+                pcs = 0
+                cs = 0
+                fz = 0
+                mo = 0
+                jr = 0
+                pep = 0
+                ad = 0
+                pw = 0
+                st = 0
+                cir = 0
+                rpt = 0
+                inter = 0
+                hr = 0
+            }
+            else{
+                sort["header"] = "NV"
+                sort["order"] = "ASC"
+                nv = 0
+            }
+            break
+        case 'Junior (JR)':
+            if (!jr){
+                sort["header"] = "JR"
+                sort["order"] = "DESC"
+                nv = 1
+                pcs = 0
+                cs = 0
+                fz = 0
+                mo = 0
+                jr = 0
+                pep = 0
+                ad = 0
+                pw = 0
+                st = 0
+                cir = 0
+                rpt = 0
+                inter = 0
+                hr = 0
+            }
+            else{
+                sort["header"] = "JR"
+                sort["order"] = "ASC"
+                jr = 0
+            }
+            break
+        case 'Performance Enrichment Program (PEP)':
+            if (!pep){
+                sort["header"] = "PEP"
+                sort["order"] = "DESC"
+                pep = 1
+                pcs = 0
+                cs = 0
+                fz = 0
+                nv = 0
+                jr = 0
+                mo = 0
+                ad = 0
+                pw = 0
+                st = 0
+                cir = 0
+                rpt = 0
+                inter = 0
+                hr = 0
+            }
+            else{
+                sort["header"] = "PEP"
+                sort["order"] = "ASC"
+                pep = 0
+            }
+            break
+        case 'Adult (AD)':
+            if (!ad){
+                sort["header"] = "AD"
+                sort["order"] = "DESC"
+                ad = 1
+                pcs = 0
+                cs = 0
+                fz = 0
+                nv = 0
+                jr = 0
+                pep = 0
+                mo = 0
+                pw = 0
+                st = 0
+                cir = 0
+                rpt = 0
+                inter = 0
+                hr = 0
+            }
+            else{
+                sort["header"] = "AD"
+                sort["order"] = "ASC"
+                ad = 0
+            }
+            break
+        case 'Power Skate (PW)':
+            if (!pw){
+                sort["header"] = "PW"
+                sort["order"] = "DESC"
+                pw = 1
+                pcs = 0
+                cs = 0
+                fz = 0
+                nv = 0
+                jr = 0
+                pep = 0
+                ad = 0
+                mo = 0
+                st = 0
+                cir = 0
+                rpt = 0
+                inter = 0
+                hr = 0
+            }
+            else{
+                sort["header"] = "PW"
+                sort["order"] = "ASC"
+                pw = 0
+            }
+            break
+        case 'Stroking (ST)':
+            if (!st){
+                sort["header"] = "ST"
+                sort["order"] = "DESC"
+                st = 1
+                pcs = 0
+                cs = 0
+                fz = 0
+                nv = 0
+                jr = 0
+                pep = 0
+                ad = 0
+                pw = 0
+                mo = 0
+                cir = 0
+                rpt = 0
+                inter = 0
+                hr = 0
+            }
+            else{
+                sort["header"] = "ST"
+                sort["order"] = "ASC"
+                st = 0
+            }
+            break
+        case 'Canskate - Circuit Drawing (CIR)':
+            if (!cir){
+                sort["header"] = "CIR"
+                sort["order"] = "DESC"
+                cir = 1
+                pcs = 0
+                cs = 0
+                fz = 0
+                nv = 0
+                jr = 0
+                pep = 0
+                ad = 0
+                pw = 0
+                st = 0
+                mo = 0
+                rpt = 0
+                inter = 0
+                hr = 0
+            }
+            else{
+                sort["header"] = "CIR"
+                sort["order"] = "ASC"
+                cir = 0
+            }
+            break
+        case 'Pre-Canskate/Canskate - Report Card (RPT)':
+            if (!rpt){
+                sort["header"] = "RPT"
+                sort["order"] = "DESC"
+                rpt = 1
+                pcs = 0
+                cs = 0
+                fz = 0
+                nv = 0
+                jr = 0
+                pep = 0
+                ad = 0
+                pw = 0
+                st = 0
+                cir = 0
+                mo = 0
+                inter = 0
+                hr = 0
+            }
+            else{
+                sort["header"] = "RPT"
+                sort["order"] = "ASC"
+                rpt = 0
+            }
+            break
+        case 'Intermediate (IN)':
+            if (!inter){
+                sort["header"] = "INTER"
+                sort["order"] = "DESC"
+                inter = 1
+                pcs = 0
+                cs = 0
+                fz = 0
+                nv = 0
+                jr = 0
+                pep = 0
+                ad = 0
+                pw = 0
+                st = 0
+                cir = 0
+                rpt = 0
+                mo = 0
+                hr = 0
+            }
+            else{
+                sort["header"] = "INTER"
+                sort["order"] = "ASC"
+                inter = 0
+            }
+            break
+        case 'Hours':
+            if (!hr){
+                sort["header"] = "HOURS"
+                sort["order"] = "DESC"
+                inter = 0
+                pcs = 0
+                cs = 0
+                fz = 0
+                nv = 0
+                jr = 0
+                pep = 0
+                ad = 0
+                pw = 0
+                st = 0
+                cir = 0
+                rpt = 0
+                mo = 0
+                hr = 1
+            }
+            else{
+                sort["header"] = "HOURS"
+                sort["order"] = "ASC"
+                hr = 0
+            }
+            break
+    }
+
+    shortArray = ["MONTH", "PCS", "CS", "FZ", "NV", "JR", "PEP", "AD", "PW", "ST", "CIR", "RPT", "INTER", 'HOURS']
+
+    var request = $.ajax({
+        url: "/sortInvoice",
+        type: "GET",
+        headers: {"season": season, "header": sort["header"], "order": sort["order"]},
+        contentType: "application/json",
+        data: {},
+        success: function(response){
+            x = seasonArray.indexOf(season)
+            table = response["sortedTable"]
+            document.getElementsByClassName("seasonTable")[x].textContent = ""
+            seasonTable = document.createElement("table")
+            document.getElementsByClassName("seasonTable")[x].appendChild(seasonTable)
+            tr = document.createElement("tr")
+            seasonTable.appendChild(tr)
+            for (var m = 0; m < shortArray.length; m ++){
+                th = document.createElement("th")
+                th.setAttribute("onclick", "sortBasedOnHeader('"+headerRow[m]+"', '"+ season + "')")
+                tr.appendChild(th)
+                th.innerHTML = headerRow[m]
+                if (shortArray[m] == sort["header"]){
+                    if (sort["order"] == "DESC"){
+                        th.innerHTML += " <i class = 'arrow down'></i>"
+                    } else {
+                        th.innerHTML += " <i class = 'arrow up'></i>"
+                    }
+                }  
+            }
+            for (y in table){
+                tr = document.createElement("tr")
+                seasonTable.appendChild(tr)
+                for (w in table[y]){
+                    td = document.createElement("td")
+                    tr.appendChild(td)
+                    td.innerHTML = table[y][w]
+                }
+            }
+        },
+        error: function(error){
+            alert("server error "+ error.status + ": " + error.responseJSON.error)
+        }
+    }).done()
 }
 
 function addMonthOptions(){
@@ -232,9 +664,11 @@ function onLoad(){
         //Show notification div after user created an invoice
         if(window.location.href.includes("/?invoiceCreated")){
             document.getElementsByClassName("notification")[0].setAttribute("style", "block")
-            document.getElementById("invoice").setAttribute("href", readCookie("invoiceFile"))
+            document.getElementById("invoice").setAttribute("href", readCookie("invoiceFile").split("expires")[0])
             document.getElementById("invoice").innerHTML = "Click Here to Access the Invoice File"
-        }
+        } else {
+            document.cookie = "invoiceFile =; expires= Thu, 01 Jan 1970 00:00:00 UTC;"
+            }
         //should allow user to create another invoice
         numSessions = 1
         addMonthOptions()
@@ -329,7 +763,7 @@ function addSession(){
         },
 
         "RPT": {
-            "value": "Pre-Canskate/Canskate - Report Card (PCS)"
+            "value": "Pre-Canskate/Canskate - Report Card (RPT)"
         }
     }
     newSession.appendChild(dropDownSpan)
@@ -382,8 +816,12 @@ function createInvoice(){
         contentType: "application/json",
         data: {},
         success: function(response){
+            today = new Date()
+            //set cookie expiry 30 mins after current datetime
+            today.setTime(today.getTime() + (30*1000*60))
+            console.log(today)
             window.location.href = "/?invoiceCreated"
-            document.cookie = "invoiceFile = "+ response["invoice"]
+            document.cookie = "invoiceFile = "+ response["invoice"] + " expires="+today.toUTCString()
         },
         error: function(error){
             alert("server error "+ error.status + ": " + error.responseJSON.error)

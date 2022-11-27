@@ -71,6 +71,7 @@ def createInvoice():
         newInvoiceDB.createSeasonTable(invoiceDict.get('season'))
         newInvoiceDB.insertNewInvoice(invoiceDict.get('season'), invoiceDict.get('month'), newInvoice.getInvoiceOutputPath())
         newInvoiceDB.fillSeasonTable(invoiceDict.get('season'), invoiceDict.get('month'), invoiceDict.get('sessions'))
+        del newInvoiceDB
         return jsonify({"success": "true", "invoice" : newInvoice.getInvoiceOutputPath()}), 201
     except Exception as e:
         return jsonify({"success": "false", "error": str(e)}), 500
@@ -91,6 +92,7 @@ def summaryInvoice():
     try:
         newInvoiceDB = summary.summaryInvoice()
         table = newInvoiceDB.showTable()
+        del newInvoiceDB
         return jsonify({"success":"true", "invoiceTable": table}), 200
     except Exception as e:
         return jsonify({"success": "false", "error": str(e)}), 500
@@ -101,12 +103,26 @@ def getInvoice():
         season = request.headers["season"]
         newInvoiceDB = summary.summaryInvoice()
         table = newInvoiceDB.getSeasonTable(season)
+        del newInvoiceDB
         return jsonify({"success":"true", "seasonTable": table})
     except Exception as e:
         if e.errno == errorcode.ER_NO_SUCH_TABLE:
             return jsonify({"success": "true", "seasonTable": 0}), 200
         else:
             return jsonify({"success": "false", "error": str(e)}), 500
+
+@app.route("/sortInvoice", methods=["GET"])
+def sortInvoice():
+    try:
+        season = request.headers["season"]
+        header = request.headers["header"]
+        order = request.headers["order"]
+        newInvoiceDB = summary.summaryInvoice()
+        table = newInvoiceDB.getSortedSeasonTable(season, header, order)
+        del newInvoiceDB
+        return jsonify({"success":"true", "sortedTable": table})
+    except Exception as e:
+        return jsonify({"success": "false", "error": str(e)}), 500
 
 
 if __name__ == "__main__":

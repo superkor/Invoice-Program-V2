@@ -2,6 +2,7 @@ import mysql.connector
 from mysql.connector import errorcode
 
 class summaryInvoice:
+    """Constructor"""
     def __init__(self):
         try:
             self.mydb = mysql.connector.connect(
@@ -106,6 +107,35 @@ class summaryInvoice:
                 return result
         except mysql.connector.Error as err:
             raise err
+
+    """
+    Returns Sorted Season Table (must have existing season table)
+    Arguments:
+    season: string (up to 255 characters)
+    header: string (up to 255 characters)
+    order: string (up to 255 characters)
+    """
+    def getSortedSeasonTable(self, season: str, header: str, order: str):
+        try:
+            self.mycursor.execute("USE invoices")
+
+            selectTable = """SELECT * FROM `%s` ORDER BY """
+
+            if header == "MONTH":
+                header = header.lower() + "s"
+                selectTable += f"str_to_date(concat(year(current_date()),'-', {header},'-01'),'%Y-%M-%D') {order}"
+            elif header == "HOURS":
+                header = header.lower()
+                selectTable += f"{header} {order}"
+            else:
+                selectTable += f"{header} {order}"
+            
+            self.mycursor.execute(selectTable, (season,))
+
+            result = self.mycursor.fetchall()
+            return result
+        except mysql.connector.Error as err:
+            raise err
     
     """
     Creates table per season to store session data and total amount.
@@ -122,7 +152,7 @@ class summaryInvoice:
             num = self.mycursor.fetchone()
             if num[0] == 0:
                 createTable = """
-                    CREATE TABLE `%s` (months varchar(255), PCS int, CS int, FZ int, NV int, JR int, PEP int, AD int, PW int, ST int, CIR int, RPT int, INTER int)
+                    CREATE TABLE `%s` (months varchar(255), PCS int, CS int, FZ int, NV int, JR int, PEP int, AD int, PW int, ST int, CIR int, RPT int, INTER int, hours double)
                 """
                 self.mycursor.execute(createTable, (season,))
                 self.mydb.commit()
@@ -140,9 +170,9 @@ class summaryInvoice:
             if not self.checkIfRecordExists(season, 1, months):
                 self.mycursor.execute("USE invoices")
                 insertIntoTable = """
-                INSERT INTO `%s` VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)   
+                INSERT INTO `%s` VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)   
                 """
-                pcs = cs = fz = nv = jr = pep = ad = pw = st = cir = rpt = inter = 0
+                pcs = cs = fz = nv = jr = pep = ad = pw = st = cir = rpt = inter = hours = 0
 
                 numberSessions = len(sessions)
                 for x in range(numberSessions):
@@ -170,15 +200,17 @@ class summaryInvoice:
                         rpt+=int(sessions[f"session{x}"]["amount"])
                     elif sessions[f"session{x}"]["type"] == "IN":
                         inter+=int(sessions[f"session{x}"]["amount"])
-                self.mycursor.execute(insertIntoTable, (season, months, pcs, cs, fz, nv, jr, pep, ad, pw, st, cir, rpt, inter))
+
+                    hours = (pcs*50+cs*30+fz*15+nv*10+jr*10+pep*30+ad*50+pw*60+st*10+cir*5+rpt*10+inter*10)/60
+                self.mycursor.execute(insertIntoTable, (season, months, pcs, cs, fz, nv, jr, pep, ad, pw, st, cir, rpt, inter, hours))
                 self.mydb.commit() 
             #if month is already in table
             else:
                 self.mycursor.execute("USE invoices")
                 insertIntoTable = """
-                UPDATE `%s` SET PCS = %s, CS = %s, FZ = %s, NV = %s, JR = %s, PEP = %s, AD = %s, PW = %s, ST = %s, CIR = %s, RPT = %s, INTER = %s WHERE months = %s   
+                UPDATE `%s` SET PCS = %s, CS = %s, FZ = %s, NV = %s, JR = %s, PEP = %s, AD = %s, PW = %s, ST = %s, CIR = %s, RPT = %s, INTER = %s, HOURS = %s WHERE months = %s   
                 """
-                pcs = cs = fz = nv = jr = pep = ad = pw = st = cir = rpt = inter = 0
+                pcs = cs = fz = nv = jr = pep = ad = pw = st = cir = rpt = inter = hours = 0
 
                 numberSessions = len(sessions)
                 for x in range(numberSessions):
@@ -206,8 +238,14 @@ class summaryInvoice:
                         rpt+=int(sessions[f"session{x}"]["amount"])
                     elif sessions[f"session{x}"]["type"] == "IN":
                         inter+=int(sessions[f"session{x}"]["amount"])
-                self.mycursor.execute(insertIntoTable, (season, pcs, cs, fz, nv, jr, pep, ad, pw, st, cir, rpt, inter, months))
+
+                hours = (pcs*50+cs*30+fz*15+nv*10+jr*10+pep*30+ad*50+pw*60+st*10+cir*5+rpt*10+inter*10)/60
+                self.mycursor.execute(insertIntoTable, (season, pcs, cs, fz, nv, jr, pep, ad, pw, st, cir, rpt, inter, hours, months))
                 self.mydb.commit() 
             
         except mysql.connector.Error as err:
             raise err
+
+    """Deconstructor"""
+    def __del__(self):
+        self.mycursor.close()
