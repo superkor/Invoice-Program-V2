@@ -133,15 +133,14 @@ def importInvoice():
         file = request.files['inputInvoice']
         filename = (secure_filename(file.filename))
         file.save(os.path.join(app.config['UPLOAD_FOLDER'],filename))
-        #return jsonify({"success": "true"}), 201
         uploadInvoice = upload.invoiceUpload(filename)
         season = uploadInvoice.getSeason()
         uploadInvoice.openUploadedFile()
         uploadInfo = uploadInvoice.getUploadedInvoiceInfo()
-        print(uploadInfo)
-        #uploadInvoice.updateDatabase()
+        #print(uploadInfo)
         uploadCalendar = uploadInvoice.getCalendar()
-        print(uploadCalendar)
+        #print(uploadCalendar)
+        uploadInvoice.updateDatabase()
         return jsonify({"success": "true", "season": season, "uploadInfo": uploadInfo, "uploadCalendar": uploadCalendar}), 200
     except Exception as e:
         print(e)

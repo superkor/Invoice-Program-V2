@@ -6,7 +6,7 @@
     </head>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/indexStyles.css')}}">
     <body onload="onLoad()">
-        <header>
+        <header onClick="window.location.href='{{url_for('home')}}'">
             <h1>Invoice Program</h1>
         </header>
         <div id = "main">
