@@ -117,7 +117,7 @@ class createInvoice:
             if self.cir >0:
                 wb["C32"] = self.cir
             if self.rpt >0:
-                wb["C32"] = self.rpt 
+                wb["C33"] = self.rpt 
         else:
             #fill invoice based on 2019-2020 template for years 2019-2022
             self.setValues()
@@ -141,6 +141,7 @@ class createInvoice:
 
         newInvoice.save(filename = self.invoiceOutputPath)
         self.fillCalendar()
+        newInvoice.close()
 
     """
     Fills the Calendar on the Calendar Spreadsheet
@@ -206,6 +207,8 @@ class createInvoice:
                         sessionText += f"{y} - {sessionDict[y]}\n"
                         #write in cell below day number
                     wb[col[colIndex]+str(int(row[rowIndex])+1)] = sessionText
+                else:
+                    wb[col[colIndex]+str(int(row[rowIndex])+1)] = ""
             #if overflow
             if rowIndex > 4:
                 rowIndex = 5
@@ -213,17 +216,19 @@ class createInvoice:
                 #add comment under day if there is session
                 sessionDict = self.getSessionOnDay(x)
                 #check if there are any sessions done on that day
-                if not(sessionDict):
+                if sessionDict:
                     for y in sessionDict:
                         sessionText += f"{y} - {sessionDict[y]}\n"
                         #write in cell below day number
-                    wb[col[colIndex]+str(int(row[rowIndex-1])+1)] = wb[col[colIndex]+str(int(row[rowIndex-1])+1)].value + "\n" + sessionText
+                    wb[col[colIndex]+str(int(row[rowIndex-1])+1)] = str(wb[col[colIndex]+str(int(row[rowIndex-1])+1)].value) + "\n" + sessionText
+                
             colIndex +=1
             if colIndex > 6:
                 colIndex = 0
                 rowIndex += 1
 
         newInvoice.save(filename = self.invoiceOutputPath)
+        newInvoice.close()
 
     """
     Sets the first day of the month on the Calendar spreadsheet and returns the column index.
@@ -253,6 +258,28 @@ class createInvoice:
         elif firstDay == 6:
             wb["B9"] = 1
             return 0
+
+    """
+    Gets the first day column in the calendar spreadsheet
+    Arguments:
+        firstday (int) - first day of the month
+    Returns the column where the first day is on the spreadsheet
+    """
+    def getFirstDay(self, firstDay):
+        if firstDay == 0:
+            return "C9"
+        elif firstDay == 1:
+            return "D9"
+        elif firstDay == 2:
+            return "E9"
+        elif firstDay == 3:
+            return "F9"
+        elif firstDay == 4:
+            return "G9"
+        elif firstDay == 5:
+            return "H9"
+        elif firstDay == 6:
+            return "B9"
 
     """
     Gets the last day of the month

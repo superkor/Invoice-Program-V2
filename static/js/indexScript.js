@@ -1,7 +1,61 @@
-var numSessions, months = ["", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+var numSessions
+months = ["", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 headerRow = ['Month', 'PreCanskate (PCS)', 'Canskate (CS)', 'Funzone (FZ)', 'Novice (NV)', 'Junior (JR)', 'Performance Enrichment Program (PEP)', 'Adult (AD)', 
                 'Power Skate (PW)', 'Stroking (ST)', 'Canskate - Circuit Drawing (CIR)', 'Pre-Canskate/Canskate - Report Card (RPT)', 'Intermediate (IN)', 'Hours']
 var seasonArray = ["2019-2020","2020-2021","2021-2022","2022-2023"]
+let options = {
+    "default": {
+        "value": "Select Session"
+    },
+
+    "PCS": {
+        "value": "Pre-Canskate (PCS)"
+    },
+
+    "CS": {
+        "value": "Canskate (CS)"
+    },
+
+    "FZ": {
+        "value": "Fun Zone (FZ)"
+    },
+
+    "IN":{
+        "value": "Intermediate (IN)"
+    },
+
+    "NV": {
+        "value": "Novice (NV)"
+    },
+
+    "JR": {
+        "value": "Junior (JR)"
+    },
+
+    "PEP": {
+        "value": "PEP"
+    },
+
+    "AD": {
+        "value": "Adult (AD)"
+    },
+
+    "PW": {
+        "value": "Power (PW)"
+    },
+
+    "ST": {
+        "value": "Stroking (ST)"
+    },
+
+    "CIR": {
+        "value": "Canskate - Circuit Drawing (CIR)"
+    },
+
+    "RPT": {
+        "value": "Pre-Canskate/Canskate - Report Card (RPT)"
+    }
+}
 
 //vars for sorting by header; 0 for high to low (month will be sorted in normal order), 1 for sort by low to high (month has no option for 1)
 var mo = 0
@@ -75,36 +129,26 @@ function seasonDropDown(elm){
 }
 
 function summaryInvoice(invoiceTable){
-    console.log(invoiceTable)
     div = document.getElementsByClassName("monthInformation")
     for (y in div){
         div[y].textContent = ""
     }
     //List all created invoices from list_invoice table
     for (x in invoiceTable){
+        w = seasonArray.indexOf(invoiceTable[x][0])
+        newDiv = document.createElement("div")
+        div[w].appendChild(newDiv)
         newRow = document.createElement("a")
         newRow.setAttribute("class", "invoiceRow")
         for (y in invoiceTable[x]){
-            checkSeason(invoiceTable[x][0], div[x])
+            console.log(invoiceTable[x][y])
             if (y != 2){
                 newRow.innerHTML += " " + invoiceTable[x][y]
             } else {
                 newRow.setAttribute("href", invoiceTable[x][y])
             }
         }
-        div[x].appendChild(newRow)
-    }
-}
-
-function checkSeason(season, newDiv){
-    if (season == "2019-2020"){
-        document.getElementById("2019-2020").appendChild(newDiv)
-    } else if (season == "2020-2021"){
-        document.getElementById("2020-2021").appendChild(newDiv)
-    } else if (season == "2021-2022"){
-        document.getElementById("2021-2022").appendChild(newDiv)
-    } else if (season == "2022-2023"){
-        document.getElementById("2022-2023").appendChild(newDiv)
+        newDiv.appendChild(newRow)
     }
 }
 
@@ -664,7 +708,7 @@ function onLoad(){
         //Show notification div after user created an invoice
         if(window.location.href.includes("/?invoiceCreated")){
             document.getElementsByClassName("notification")[0].setAttribute("style", "block")
-            document.getElementById("invoice").setAttribute("href", readCookie("invoiceFile").split("expires")[0])
+            document.getElementById("invoice").setAttribute("href", readCookie("invoiceFile"))
             document.getElementById("invoice").innerHTML = "Click Here to Access the Invoice File"
         } else {
             document.cookie = "invoiceFile =; expires= Thu, 01 Jan 1970 00:00:00 UTC;"
@@ -713,59 +757,6 @@ function addSession(){
     deleteButton.setAttribute("value","Delete Session")
     deleteButton.addEventListener("click",deleteSession)
 
-    let options = {
-        "default": {
-            "value": "Select Session"
-        },
-
-        "PCS": {
-            "value": "Pre-Canskate (PCS)"
-        },
-
-        "CS": {
-            "value": "Canskate (CS)"
-        },
-
-        "FZ": {
-            "value": "Fun Zone (FZ)"
-        },
-
-        "IN":{
-            "value": "Intermediate (IN)"
-        },
-
-        "NV": {
-            "value": "Novice (NV)"
-        },
-
-        "JR": {
-            "value": "Junior (JR)"
-        },
-
-        "PEP": {
-            "value": "PEP"
-        },
-
-        "AD": {
-            "value": "Adult (AD)"
-        },
-
-        "PW": {
-            "value": "Power (PW)"
-        },
-
-        "ST": {
-            "value": "Stroking (ST)"
-        },
-
-        "CIR": {
-            "value": "Canskate - Circuit Drawing (CIR)"
-        },
-
-        "RPT": {
-            "value": "Pre-Canskate/Canskate - Report Card (RPT)"
-        }
-    }
     newSession.appendChild(dropDownSpan)
     newSession.appendChild(numSpan)
     newSession.appendChild(dateSpan)
@@ -778,6 +769,9 @@ function addSession(){
         dropDown = document.createElement("option")
         if (key == "default"){
             dropDown.setAttribute("value", "")
+            dropDown.setAttribute("selected","")
+            dropDown.setAttribute("disabled","")
+            dropDown.setAttribute("hidden","")
         } else {
             dropDown.setAttribute("value", key)
             if (key == "IN" || key == "NV" || key == "JR" || key == "CIR" || key == "RPT" || key == "FZ"){
@@ -819,12 +813,286 @@ function createInvoice(){
             today = new Date()
             //set cookie expiry 30 mins after current datetime
             today.setTime(today.getTime() + (30*1000*60))
-            console.log(today)
             window.location.href = "/?invoiceCreated"
-            document.cookie = "invoiceFile = "+ response["invoice"] + " expires="+today.toUTCString()
+            document.cookie = "invoiceFile = "+ response["invoice"] + ";expires="+today.toUTCString()
         },
         error: function(error){
             alert("server error "+ error.status + ": " + error.responseJSON.error)
         }
     }).done()
+}
+
+function getSeason(year, month){
+    month = months.indexOf(month)
+    if (month >= 9){
+        return year+"-"+(year-1+2)
+    } else {
+        return (year-1)+"-"+(year)
+    }
+}
+
+function uploadInvoice(){
+    var form_data = new FormData($('#import-invoice')[0])
+    var request = $.ajax({
+        url: "/importInvoice",
+        type: "POST",
+        contentType: false,
+        data: form_data,
+        processData: false,
+        success: function(response){
+            document.getElementById("importInfo").innerHTML = ""
+            calDiv = document.getElementById("calDiv")
+            calDiv.innerHTML = ""
+            for (const [key, value] of Object.entries(response["uploadInfo"])){
+                document.getElementById("importInfo").innerHTML += key+": "+value+" "
+            }
+            document.getElementById("importInfo").innerHTML += "<br>"
+            var i=0
+            
+            season = getSeason(response["uploadInfo"]["year"], response["uploadInfo"]["month"])
+            month = response["uploadInfo"]["month"]
+
+            displaySeason = document.createElement("div")
+            displaySeason.setAttribute("id", "season")
+            displaySeason.innerHTML = season
+            calDiv.appendChild(displaySeason)
+
+            displayMonth = document.createElement("div")
+            displayMonth.setAttribute("id", "month")
+            displayMonth.innerHTML = month
+            calDiv.appendChild(displayMonth)
+
+            sessionDiv = document.createElement("div")
+            sessionDiv.setAttribute("id", "sessionsFromImport")
+            calDiv.appendChild(sessionDiv)
+
+            //go through uploadCalendar dict from server
+            for (const [key, value] of Object.entries(response["uploadCalendar"])){
+                //semicolons separate between different session types in one day. # of semicolons - 1 = number of sessions in that day
+                valueArrayLength = value.split(";").length - 1
+                for (var x = 0; x < valueArrayLength; x++){
+                    newCalRow = document.createElement("div")
+                    newCalRow.setAttribute("id", "import"+i)
+                    sessionDiv.appendChild(newCalRow)
+                    newSpan = document.createElement("span")
+                    newCalRow.appendChild(newSpan)
+                    newDropDown = document.createElement("select")
+                    newSpan.appendChild(newDropDown)
+                    newDropDown.setAttribute("name", "import-session-type")
+                    newDropDown.setAttribute("class", "import-session-type")
+                    newDropDown.setAttribute("required","")
+
+                    //go through options dict for drop down. display default option if that's the session for that day. exclude options based on season
+                    for (const [sessionValue, sessionName] of Object.entries(options)){
+                        if (sessionValue != "default"){
+                            if (season == "2022-2023"){
+                                if (sessionValue != "IN"){
+                                    dropDown = document.createElement("option")
+                                    dropDown.setAttribute("value", sessionValue)
+                                    dropDown.innerHTML = sessionName.value
+                                    newDropDown.appendChild(dropDown)
+                                }
+                            } else {
+                                if (sessionValue != "NV" && sessionValue != "JR" && sessionValue != "CIR" && sessionValue != "RPT" && sessionValue != "FZ"){
+                                    dropDown = document.createElement("option")
+                                    dropDown.setAttribute("value", sessionValue)
+                                    dropDown.innerHTML = sessionName.value
+                                    newDropDown.appendChild(dropDown)
+                                }
+                            }
+                            if (sessionValue == value.split(";")[x].split(" ")[0]){
+                                dropDown.setAttribute("selected","")
+                                i++
+                            }
+                        }
+                    }
+                    
+                    //get amount of session on that day and set that as default value
+                    newSpanSessionAmount = document.createElement("span")
+                    newCalRow.appendChild(newSpanSessionAmount)
+                    numInput = document.createElement("input")
+                    newSpanSessionAmount.appendChild(numInput)
+                    numInput.setAttribute("name","import-session-amount")
+                    numInput.setAttribute("class","import-session-amount")
+                    numInput.setAttribute("type","number")
+                    numInput.setAttribute("placeholder","Number of Sessions")
+                    numInput.setAttribute("required","")
+                    numInput.setAttribute("value",value.split(";")[x].split(" ")[2])
+                    
+                    //get what day the session occured and set that as default day. also sets min and max dates (based on the invoice month and year)
+                    dateSpan = document.createElement("span")
+                    newCalRow.appendChild(dateSpan)
+                    dateInput = document.createElement("input")
+                    dateInput.setAttribute("name","import-date-of-session")
+                    dateInput.setAttribute("type","date")
+                    dateInput.setAttribute("required","")
+                    dateInput.setAttribute("class","import-date-of-session")
+
+                    dateYear = response["uploadInfo"]["year"]
+
+                    dateMonth = months.indexOf(response["uploadInfo"]["month"]).toString()
+                    if (dateMonth.length == 1){
+                        dateMonth = "0"+dateMonth
+                    }
+                    dateDay = key.split(" ")[1]
+                    if (dateDay.length == 1){
+                        dateDay = "0"+dateDay
+                    }
+                    dateInput.setAttribute("value", dateYear+"-"+dateMonth+"-"+dateDay)
+                    dateInput.setAttribute("min",dateYear+"-"+dateMonth+"-01")
+                    dateInput.setAttribute("max",dateYear+"-"+dateMonth+"-"+getLastDay(dateMonth,dateYear))
+                    dateSpan.appendChild(dateInput)
+                    
+                    //add delete session button to delete session
+                    deleteButton = document.createElement("input")
+                    deleteButton.setAttribute("type", "button")
+                    deleteButton.setAttribute("id","deleteSession")
+                    deleteButton.setAttribute("value","Delete Session")
+                    deleteButton.addEventListener("click",deleteSession)
+                    newCalRow.appendChild(deleteButton)
+
+                }
+            }
+            
+            //add button to add new sessions
+            var addNewSession = document.createElement("input")
+            calDiv.appendChild(addNewSession)
+            addNewSession.setAttribute("type", "button")
+            addNewSession.setAttribute("id", "import-add-session")
+            addNewSession.setAttribute("onclick", "newSession('"+response["uploadInfo"]["month"]+"',"+dateYear+")")
+            addNewSession.setAttribute("value", "Add Session")
+
+            //add button to submit changes to server
+            var submitButton = document.createElement("input")
+            calDiv.appendChild(submitButton)
+            submitButton.setAttribute("type", "submit")
+            submitButton.setAttribute("value", "Update")
+            submitButton.setAttribute("onclick", "updateImport('"+response["uploadInfo"]["month"]+"',"+dateYear+",'"+response["uploadInfo"]["name"]+"','"+response["uploadInfo"]["rate"]+"')")
+            
+        },
+        error: function(error){
+            alert("server error "+ error.status + ": " + error.responseJSON.error)
+        }
+    }).done()
+}
+
+function newSession(month, year){
+    sessionDiv = document.getElementById("sessionsFromImport")
+    season = getSeason(year, month)
+
+    var addNewSession = document.createElement("div")
+    sessionDiv.appendChild(addNewSession)
+
+    monthIndex = months.indexOf(month).toString()
+
+    dropDownSpan = document.createElement("span")
+    addNewSession.appendChild(dropDownSpan)
+    newDropDown = document.createElement("select")
+    dropDownSpan.appendChild(newDropDown)
+    newDropDown.setAttribute("name", "import-session-type")
+    newDropDown.setAttribute("class", "import-session-type")
+    newDropDown.setAttribute("required","")
+
+
+    for (const [sessionValue, sessionName] of Object.entries(options)){
+        if (sessionValue != "default"){
+            if (season == "2022-2023"){
+                if (sessionValue != "IN"){
+                    dropDown = document.createElement("option")
+                    dropDown.setAttribute("value", sessionValue)
+                    dropDown.innerHTML = sessionName.value
+                    newDropDown.appendChild(dropDown)
+                }
+            } else {
+                if (sessionValue != "NV" && sessionValue != "JR" && sessionValue != "CIR" && sessionValue != "RPT" && sessionValue != "FZ"){
+                    dropDown = document.createElement("option")
+                    dropDown.setAttribute("value", sessionValue)
+                    dropDown.innerHTML = sessionName.value
+                    newDropDown.appendChild(dropDown)
+
+                }
+            }
+        }
+        else {
+            dropDown = document.createElement("option")
+            dropDown.setAttribute("value", sessionValue)
+            dropDown.setAttribute("selected","")
+            dropDown.innerHTML = sessionName.value
+            newDropDown.appendChild(dropDown)
+        }
+        
+    }
+
+    newSpanSessionAmount = document.createElement("span")
+    addNewSession.appendChild(newSpanSessionAmount)
+    numInput = document.createElement("input")
+    newSpanSessionAmount.appendChild(numInput)
+    numInput.setAttribute("name","import-session-amount")
+    numInput.setAttribute("class","import-session-amount")
+    numInput.setAttribute("type","number")
+    numInput.setAttribute("placeholder","Number of Sessions")
+    numInput.setAttribute("required","")
+
+    dateSpan = document.createElement("span")
+    addNewSession.appendChild(dateSpan)
+    dateInput = document.createElement("input")
+    dateInput.setAttribute("name","import-date-of-session")
+    dateInput.setAttribute("type","date")
+    dateInput.setAttribute("required","")
+    dateInput.setAttribute("class","import-date-of-session")
+
+    dateMonth = months.indexOf(month).toString()
+    if (dateMonth.length == 1){
+        dateMonth = "0"+dateMonth
+    }
+    dateInput.setAttribute("min",year+"-"+dateMonth+"-01")
+    dateInput.setAttribute("max",year+"-"+dateMonth+"-"+getLastDay(dateMonth,year))
+    dateSpan.appendChild(dateInput)
+    
+    //add delete session button to delete session
+    deleteButton = document.createElement("input")
+    deleteButton.setAttribute("type", "button")
+    deleteButton.setAttribute("id","deleteSession")
+    deleteButton.setAttribute("value","Delete Session")
+    deleteButton.addEventListener("click",deleteSession)
+    addNewSession.appendChild(deleteButton)
+
+}
+
+function updateImport(month, year, name, rate){
+    selectedSessions = document.getElementsByClassName("import-session-type")
+    selectedAmounts = document.getElementsByClassName("import-session-amount")
+    selectedDates = document.getElementsByClassName("import-date-of-session")
+
+    sessions = [], amounts = [], dates = []
+
+    for (var i = 0; i < selectedSessions.length; i++){
+        sessions.push(selectedSessions[i].value)
+        amounts.push(selectedAmounts[i].value)
+        dates.push(selectedDates[i].value)
+    }
+
+    season = getSeason(year, month)
+
+    data = {"season": season, "month": month, "sessions": sessions, "amount": amounts, "date": dates, "name": name, "rate": rate, "comments": ""}
+    console.log(data)
+
+    var request = $.ajax({
+        url: "/updateImport",
+        type: "POST",
+        processData: false,
+        contentType: false,
+        data: JSON.stringify(data),
+        success: function(response){
+            today = new Date()
+            //set cookie expiry 30 mins after current datetime
+            today.setTime(today.getTime() + (30*1000*60))
+            window.location.href = "/?invoiceCreated"
+            document.cookie = "invoiceFile = "+ response["invoice"] + ";expires="+today.toUTCString()
+        },
+        error: function(error){
+            alert("server error "+ error.status + ": " + error.responseJSON.error)
+        }
+    }).done()
+
 }

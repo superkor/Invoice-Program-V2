@@ -12,15 +12,16 @@
         <div id = "main">
             <!-- After creating invoice, notification on successful creation will show (will provide download link to the invoice itself) -->
             <div class = "notification" style="display:none">
-                <a id="invoice">Test</a>
+                <a id="invoice"></a>
             </div>
+
             <div class="tab">
                 <button id = "createButton" class="tablink active" onclick="openTab(event, 'create')">Invoice Creation</button>
+                <button id = "importButton" class="tablink" onclick="openTab(event, 'import')">Import Invoice</button>
                 <button id = "summaryButton" class="tablink" onclick="openTab(event, 'summary')">Summary of Invoices</button>
             </div>
     
             <div id="create" class="tabcontent" style="display:block">
-                Invoice Creation Test
                 <form action="create" method="GET" enctype="multipart/form-data">
                     <div id = "SeasonDiv">
                         <label for="season">Season</label>
@@ -53,7 +54,7 @@
                         <textarea name="comments" id="comments" rows="4" cols="50" style="white-space: pre-wrap"></textarea>
                     </div>
                     <div id = "List-Of-Sessions">
-                        <div id = "Session1">
+                        <div id = "Session0">
                             <span>
                                 <select name = "session-type" required>
                                     <option value="" selected disabled hidden>Select Session</option>
@@ -117,6 +118,28 @@
                 </div>
             </div>
         </div>
+                
+        <div id ="import" class = "tabcontent">
+            Import Invoice
+            <div>            
+                <form id="import-invoice" method="POST" enctype="multipart/form-data">
+                    <div>
+                        <label for="inputInvoice">Select an invoice:</label>
+                        <input type="file" id="inputInvoice" name="inputInvoice" accept=".xlsx">
+                    </div>
+                    <div>
+                        <input type="button" value="Submit" id = "upload-file-submit" onclick="uploadInvoice()">
+                    </div>
+                </form>
+            </div>
+            <div id="importInfo">
+                
+            </div>
+            <div id = "calDiv">
+            </div>
+            
+        </div>
+
         <!-- Confirmation div after input for Invoice Creation -->
         <div id = "fromCreate" style="display:none">
             <!-- Sent input data -->
@@ -137,6 +160,6 @@
             </div>
             <input type="button" id="confirmButton" value="Confirm" onClick="createInvoice()">
             <input type="button" id="cancelButton" value="Cancel" onClick="window.location.href='{{url_for('home')}}'">
-        </div>        
+        </div>      
     </body>
 </html>
