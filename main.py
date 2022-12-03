@@ -129,22 +129,22 @@ def sortInvoice():
 
 @app.route("/importInvoice", methods=["POST"])
 def importInvoice():
-    """ try: """
-    file = request.files['inputInvoice']
-    filename = (secure_filename(file.filename))
-    file.save(os.path.join(app.config['UPLOAD_FOLDER'],filename))
-    #return jsonify({"success": "true"}), 201
-    uploadInvoice = upload.invoiceUpload(filename)
-    season = uploadInvoice.getSeason()
-    uploadInvoice.openUploadedFile()
-    uploadInfo = uploadInvoice.getUploadedInvoiceInfo()
-    print(uploadInfo)
-    #uploadInvoice.updateDatabase()
-    uploadCalendar = uploadInvoice.getCalendar()
-    print(uploadCalendar)
-    return jsonify({"success": "true", "season": season, "uploadInfo": uploadInfo, "uploadCalendar": uploadCalendar}), 200
-"""     except Exception as e:
-        print(e) """
+    try:
+        file = request.files['inputInvoice']
+        filename = (secure_filename(file.filename))
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'],filename))
+        #return jsonify({"success": "true"}), 201
+        uploadInvoice = upload.invoiceUpload(filename)
+        season = uploadInvoice.getSeason()
+        uploadInvoice.openUploadedFile()
+        uploadInfo = uploadInvoice.getUploadedInvoiceInfo()
+        print(uploadInfo)
+        #uploadInvoice.updateDatabase()
+        uploadCalendar = uploadInvoice.getCalendar()
+        print(uploadCalendar)
+        return jsonify({"success": "true", "season": season, "uploadInfo": uploadInfo, "uploadCalendar": uploadCalendar}), 200
+    except Exception as e:
+        print(e)
         #return jsonify({"success": "false", "error": str(e)}), 500
 
 @app.route("/updateImport", methods=["POST"])
