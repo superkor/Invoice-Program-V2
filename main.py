@@ -1,9 +1,16 @@
 from flask import Flask, abort, render_template, request, jsonify, send_file
 import static.python.invoiceCreation as invoice
 import static.python.invoiceSummary as summary
+import static.python.invoiceUpload as upload
 from mysql.connector import errorcode
+from werkzeug.utils import secure_filename
+import os
+import json
 
 app = Flask(__name__, template_folder='templates')
+app.config['UPLOAD_FOLDER'] = "invoice/upload"
+ALLOWED_EXTENSIONS = {'xlsx'}
+
 
 """
 TODO
@@ -62,29 +69,25 @@ def serverError(e):
 
 @app.route('/createInvoice', methods=["POST"])
 def createInvoice():
-    try:
-        newInvoice = invoice.createInvoice(invoiceDict.get('season'), invoiceDict.get('month'), invoiceDict.get('name'), invoiceDict.get('rate'), invoiceDict.get('comments'), invoiceDict.get('sessions'))
-        newInvoice.openTemplate()
-        newInvoice.fillInvoice()
-        #passes invoiceDict information to invoice creation
-        newInvoiceDB = summary.summaryInvoice()
-        newInvoiceDB.createSeasonTable(invoiceDict.get('season'))
-        newInvoiceDB.insertNewInvoice(invoiceDict.get('season'), invoiceDict.get('month'), newInvoice.getInvoiceOutputPath())
-        newInvoiceDB.fillSeasonTable(invoiceDict.get('season'), invoiceDict.get('month'), invoiceDict.get('sessions'))
-        del newInvoiceDB
-        return jsonify({"success": "true", "invoice" : newInvoice.getInvoiceOutputPath()}), 201
-    except Exception as e:
-        return jsonify({"success": "false", "error": str(e)}), 500
+    """ try: """
+    newInvoice = invoice.createInvoice(invoiceDict.get('season'), invoiceDict.get('month'), invoiceDict.get('name'), invoiceDict.get('rate'), invoiceDict.get('comments'), invoiceDict.get('sessions'))
+    newInvoice.openTemplate()
+    newInvoice.fillInvoice()
+    #passes invoiceDict information to invoice creation
+    newInvoiceDB = summary.summaryInvoice()
+    newInvoiceDB.createSeasonTable(invoiceDict.get('season'))
+    newInvoiceDB.insertNewInvoice(invoiceDict.get('season'), invoiceDict.get('month'), newInvoice.getInvoiceOutputPath())
+    newInvoiceDB.fillSeasonTable(invoiceDict.get('season'), invoiceDict.get('month'), invoiceDict.get('sessions'))
+    del newInvoiceDB
+    return jsonify({"success": "true", "invoice" : newInvoice.getInvoiceOutputPath()}), 201
+    """ except Exception as e:
+        return jsonify({"success": "false", "error": str(e)}), 500 """
 
 @app.route("/invoice/<path:filename>", methods=["GET","POST"])
 def download(filename):
     path = "invoice\\"+filename
     return send_file(path, as_attachment=True)
 
-def getUrl():
-    return request.url
-
-def getUrlRoot():
     return request.url_root
 
 @app.route("/summaryInvoice", methods=["GET"])
@@ -124,6 +127,78 @@ def sortInvoice():
     except Exception as e:
         return jsonify({"success": "false", "error": str(e)}), 500
 
+@app.route("/importInvoice", methods=["POST"])
+def importInvoice():
+    try:
+        file = request.files['inputInvoice']
+        filename = (secure_filename(file.filename))
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'],filename))
+        #return jsonify({"success": "true"}), 201
+        uploadInvoice = upload.invoiceUpload(filename)
+        season = uploadInvoice.getSeason()
+        uploadInvoice.openUploadedFile()
+        uploadInfo = uploadInvoice.getUploadedInvoiceInfo()
+        print(uploadInfo)
+        #uploadInvoice.updateDatabase()
+        uploadCalendar = uploadInvoice.getCalendar()
+        print(uploadCalendar)
+        return jsonify({"success": "true", "season": season, "uploadInfo": uploadInfo, "uploadCalendar": uploadCalendar}), 200
+    except Exception as e:
+        print(e)
+        #return jsonify({"success": "false", "error": str(e)}), 500
+
+@app.route("/updateImport", methods=["POST"])
+def updateImport():
+    #Add comments later
+    #comments = request.args.get("comments")
+    data = json.loads(request.data, strict=False)
+    print(data)
+    season = data["season"]
+    month = data["month"]
+    listSessions = data["sessions"]
+    listSessionsAmount = data["amount"]
+    listSessionsDate = data["date"]
+    comments = data["comments"]
+    name = data["name"]
+    rate = data["rate"]
+
+    numberSessions = len(listSessions)
+    numberAmount = len(listSessionsAmount)
+    numberDate = len(listSessionsDate)
+
+    #raise 400 if session data array doesn't have the same length
+    if (numberAmount != numberSessions or numberSessions != numberDate):
+        abort(400, description="Sessions has missing data "+ str({"session-type": listSessions, "sessions-amount": listSessionsAmount, "date-of-session": listSessionsDate}))
+    elif (numberAmount == 0 or numberSessions == 0 or numberDate == 0):
+        abort(400, description= "Empty query")
+
+    sessions = {}
+    #creating dict of sessions
+    for x in range (numberSessions):
+        sessions["session"+str(x)] = {"type": listSessions[x], "amount": listSessionsAmount[x], "date": listSessionsDate[x]}
+
+    if comments == None:
+        comments = ""
+
+    updateInvoiceDict = {
+        "season": season,
+        "month": month,
+        "comments": comments,
+        "sessions": sessions,
+        "name": name,
+        "rate": rate
+    }
+
+    newInvoice = invoice.createInvoice(updateInvoiceDict.get('season'), updateInvoiceDict.get('month'), updateInvoiceDict.get('name'), updateInvoiceDict.get('rate'), updateInvoiceDict.get('comments'), updateInvoiceDict.get('sessions'))
+    newInvoice.openTemplate()
+    newInvoice.fillInvoice()
+    #passes updateInvoiceDict information to invoice creation
+    newInvoiceDB = summary.summaryInvoice()
+    newInvoiceDB.createSeasonTable(updateInvoiceDict.get('season'))
+    newInvoiceDB.insertNewInvoice(updateInvoiceDict.get('season'), updateInvoiceDict.get('month'), newInvoice.getInvoiceOutputPath())
+    newInvoiceDB.fillSeasonTable(updateInvoiceDict.get('season'), updateInvoiceDict.get('month'), updateInvoiceDict.get('sessions'))
+    del newInvoiceDB
+    return jsonify({"success": "true", "invoice" : newInvoice.getInvoiceOutputPath()}), 201
 
 if __name__ == "__main__":
     app.run(debug=True)
