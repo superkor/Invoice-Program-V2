@@ -71,8 +71,8 @@ The created invoice (server side) is located in `invoice/output`. Invoice file n
 
 In the created invoice file, the timesheet and calendar has been filled in with the information:
 
-(https://github.com/superkor/Invoice-Program-V2/blob/main/images/sampleinvoice.png)
-(https://github.com/superkor/Invoice-Program-V2/blob/main/images/samplecal.png)
+![sample timesheet](https://github.com/superkor/Invoice-Program-V2/blob/main/images/sampleinvoice.png)
+![sample calendar](https://github.com/superkor/Invoice-Program-V2/blob/main/images/samplecal.png)
 
 The calendar will automatically fill in the sessions and amount done in a day.
 
