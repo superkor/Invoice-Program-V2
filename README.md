@@ -28,9 +28,7 @@ Open the local webpage as seen in the python console (usually 127.0.0.1:5000).
 
 ## Creating an Invoice
 
-Opening the web application will show the Invoice Creation tab.
-
-(https://github.com/superkor/Invoice-Program-V2/blob/main/images/createpage.png)
+Opening the web application will show the Invoice Creation tab.(https://github.com/superkor/Invoice-Program-V2/blob/main/images/createpage.png)
 
 The default prompts are shown: season, month, name, hourly rate, comments, and session.
 
@@ -63,11 +61,9 @@ The Date selector on each session row will be locked to the month and season you
 
 Click Confirm to create the invoice with inputs entered.
 
-Upon clicking confirm and when the invoice has been created, user will be redirected back to root with a notification at the top of the page with a download link to the created invoice:
+Upon clicking confirm and when the invoice has been created, user will be redirected back to root with a notification at the top of the page with a download link to the created invoice: (https://github.com/superkor/Invoice-Program-V2/blob/main/images/invoicecreated.png)
 
-(https://github.com/superkor/Invoice-Program-V2/blob/main/images/invoicecreated.png)
-
-The created invoice (server side) is located in `invoice/output`. Invoice file name will be `{Month} {Year} Invoice.xslx`, with the year based on the season and month selected.
+The created invoice (server side) is located in `invoice/output`. Invoice file name will be `{Month} {Year} Invoice.xlxx`, with the year based on the season and month selected.
 
 ### Viewing the Created Invoice
 
