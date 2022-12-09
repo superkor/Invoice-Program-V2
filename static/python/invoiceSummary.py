@@ -246,6 +246,29 @@ class summaryInvoice:
         except mysql.connector.Error as err:
             raise err
 
+    """
+    Deletes Invoice from Database
+    Arguments: 
+    season: str
+    month: str
+    """
+    def deleteInvoice(self, season: str, month: str):
+        try:
+            self.mycursor.execute("USE invoices")
+            deleteFromListTable = """
+            DELETE FROM list_invoices WHERE season = %s AND months = %s
+            """
+            self.mycursor.execute(deleteFromListTable, (season, month))
+            self.mydb.commit()
+
+            deleteFromSeasonTable = """
+            DELETE FROM `%s` WHERE months = %s
+            """
+            self.mycursor.execute(deleteFromSeasonTable, (season, month))
+            self.mydb.commit()
+        except mysql.connector.Error as err:
+            raise err
+
     """Deconstructor"""
     def __del__(self):
         self.mycursor.close()

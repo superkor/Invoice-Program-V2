@@ -137,19 +137,53 @@ function summaryInvoice(invoiceTable){
     for (x in invoiceTable){
         w = seasonArray.indexOf(invoiceTable[x][0])
         newDiv = document.createElement("div")
+        newDiv.setAttribute("style", "text-align: left; padding: 2rem 2rem;")
         div[w].appendChild(newDiv)
         newRow = document.createElement("a")
         newRow.setAttribute("class", "invoiceRow")
+        newRow.setAttribute("style", "float: left; display: inline-block; vertical-align:center; padding: 1rem 1rem;")
+
+        newDeleteA = document.createElement("a")
+        newDeleteButton = document.createElement("button")
+        newDeleteA.setAttribute("style", "float: left; display: inline-block; vertical-align:center; padding: 1rem 1rem;")
+        newDeleteButton.innerHTML = "Delete Invoice"
+        var parms = ""
+
+
         for (y in invoiceTable[x]){
-            console.log(invoiceTable[x][y])
             if (y != 2){
                 newRow.innerHTML += " " + invoiceTable[x][y]
+                parms += invoiceTable[x][y] + " "
             } else {
                 newRow.setAttribute("href", invoiceTable[x][y])
             }
         }
+        newDeleteA.setAttribute("onclick", "deleteInvoice('"+parms+"')")
         newDiv.appendChild(newRow)
+        newDeleteA.appendChild(newDeleteButton)
+        newDiv.setAttribute("id", parms)
+        newDiv.appendChild(newDeleteA)
     }
+}
+
+function deleteInvoice(parms, elm){
+    season = parms.split(" ")[0]
+    month = parms.split(" ")[1]
+    sendParm = season + " " + month
+
+    var request = $.ajax({
+        url: "/deleteInvoice",
+        type: "POST",
+        headers: {},
+        contentType: "application/json",
+        data: JSON.stringify({"parms": sendParm}),
+        success: function(response){
+            document.getElementById(parms).remove()
+        },
+        error: function(error){
+            alert("server error "+ error.status + ": " + error.responseJSON.error)
+        }
+    }).done()
 }
 
 function addSeasonTable(season,x){
