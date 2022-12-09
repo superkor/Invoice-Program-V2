@@ -35,7 +35,7 @@ The default prompts are shown: season, month, name, hourly rate, comments, and s
 
 Season will contain the available seasons the invoices can be made towards, 2019-2020, 2020-2021, 2021-2022, 2022-2023.
 
-> :exclamation: **Note**: by choosing 2022-2023, the "INTER" (Intermediate) session will not be available to be selected and the CIR, RPT, NV, JR, and ST sessions will be available. By choosing any other season, vice versa will occur.
+> **Note**: by choosing 2022-2023, the "INTER" (Intermediate) session will not be available to be selected and the CIR, RPT, NV, JR, and ST sessions will be available. By choosing any other season, vice versa will occur.
 
 Month has all of the months in a year.
 
@@ -45,7 +45,7 @@ Hourly Rate only accepts a number (where you enter your hourly rate).
 
 Comments is a multiline input that allows you to enter any comments onto the invoice.
 
-###Sessions
+### Sessions
 
 Based on the season, the dropdown will show possible sessions that can be selected. Each row represents a session type performed in a day.
 
