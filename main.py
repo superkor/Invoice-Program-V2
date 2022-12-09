@@ -14,8 +14,15 @@ ALLOWED_EXTENSIONS = {'xlsx'}
 
 """
 TODO
-- Add check when creating invoice for a season and month that already exists
+✅ Added check when creating invoice for a season and month that already exists
+✅ Added import invoice (able to upload and edit)
+✅ Allowed deletion of existing invoice
+✅ Added option to view existing invoices
+✅ Added table of sessions done per season based on existing invoices
+- Add option to sessions that user covered someone
+- Change amount of sessions on calendar to amount of minutes
 - Add update/edit function for an existing invoice
+- Add some data analysis in summary
 """
 
 @app.route("/")
@@ -69,19 +76,19 @@ def serverError(e):
 
 @app.route('/createInvoice', methods=["POST"])
 def createInvoice():
-    """ try: """
-    newInvoice = invoice.createInvoice(invoiceDict.get('season'), invoiceDict.get('month'), invoiceDict.get('name'), invoiceDict.get('rate'), invoiceDict.get('comments'), invoiceDict.get('sessions'))
-    newInvoice.openTemplate()
-    newInvoice.fillInvoice()
-    #passes invoiceDict information to invoice creation
-    newInvoiceDB = summary.summaryInvoice()
-    newInvoiceDB.createSeasonTable(invoiceDict.get('season'))
-    newInvoiceDB.insertNewInvoice(invoiceDict.get('season'), invoiceDict.get('month'), newInvoice.getInvoiceOutputPath())
-    newInvoiceDB.fillSeasonTable(invoiceDict.get('season'), invoiceDict.get('month'), invoiceDict.get('sessions'))
-    del newInvoiceDB
-    return jsonify({"success": "true", "invoice" : newInvoice.getInvoiceOutputPath()}), 201
-    """ except Exception as e:
-        return jsonify({"success": "false", "error": str(e)}), 500 """
+    try:
+        newInvoice = invoice.createInvoice(invoiceDict.get('season'), invoiceDict.get('month'), invoiceDict.get('name'), invoiceDict.get('rate'), invoiceDict.get('comments'), invoiceDict.get('sessions'))
+        newInvoice.openTemplate()
+        newInvoice.fillInvoice()
+        #passes invoiceDict information to invoice creation
+        newInvoiceDB = summary.summaryInvoice()
+        newInvoiceDB.createSeasonTable(invoiceDict.get('season'))
+        newInvoiceDB.insertNewInvoice(invoiceDict.get('season'), invoiceDict.get('month'), newInvoice.getInvoiceOutputPath())
+        newInvoiceDB.fillSeasonTable(invoiceDict.get('season'), invoiceDict.get('month'), invoiceDict.get('sessions'))
+        del newInvoiceDB
+        return jsonify({"success": "true", "invoice" : newInvoice.getInvoiceOutputPath()}), 201
+    except Exception as e:
+        return jsonify({"success": "false", "error": str(e)}), 500
 
 @app.route("/invoice/<path:filename>", methods=["GET","POST"])
 def download(filename):
@@ -143,15 +150,13 @@ def importInvoice():
         uploadInvoice.updateDatabase()
         return jsonify({"success": "true", "season": season, "uploadInfo": uploadInfo, "uploadCalendar": uploadCalendar}), 200
     except Exception as e:
-        print(e)
-        #return jsonify({"success": "false", "error": str(e)}), 500
+        return jsonify({"success": "false", "error": str(e)}), 500
 
 @app.route("/updateImport", methods=["POST"])
 def updateImport():
     #Add comments later
     #comments = request.args.get("comments")
     data = json.loads(request.data, strict=False)
-    print(data)
     season = data["season"]
     month = data["month"]
     listSessions = data["sessions"]
@@ -198,6 +203,20 @@ def updateImport():
     newInvoiceDB.fillSeasonTable(updateInvoiceDict.get('season'), updateInvoiceDict.get('month'), updateInvoiceDict.get('sessions'))
     del newInvoiceDB
     return jsonify({"success": "true", "invoice" : newInvoice.getInvoiceOutputPath()}), 201
+
+@app.route("/deleteInvoice", methods=["POST"])
+def deleteInvoice():
+    data = json.loads(request.data, strict=False)
+    parm = data["parms"]
+    season = parm.split(" ")[0]
+    month = parm.split(" ")[1]
+
+    delInvoice = summary.summaryInvoice()
+    delInvoice.deleteInvoice(season,month)
+
+    del delInvoice
+
+    return jsonify({"success": "true", }), 201
 
 if __name__ == "__main__":
     app.run(debug=True)
