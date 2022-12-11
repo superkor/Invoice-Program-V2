@@ -3,6 +3,14 @@
         <title> Invoice Program </title>
         <script src="{{ url_for('static', filename='js/indexScript.js')}}"></script>
         <script src="{{ url_for('static', filename='js/jquery.js')}}"></script>
+        <script src="{{ url_for('static', filename='js/graph.js')}}"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            months = ["", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+            headerRow = ['Month', 'PreCanskate (PCS)', 'Canskate (CS)', 'Funzone (FZ)', 'Novice (NV)', 'Junior (JR)', 'Performance Enrichment Program (PEP)', 'Adult (AD)', 
+                            'Power Skate (PW)', 'Stroking (ST)', 'Canskate - Circuit Drawing (CIR)', 'Pre-Canskate/Canskate - Report Card (RPT)', 'Intermediate (IN)', 'Hours']
+            var seasonArray = ["2019-2020","2020-2021","2021-2022","2022-2023"]
+        </script>
     </head>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/indexStyles.css')}}">
     <body onload="onLoad()">
@@ -95,24 +103,35 @@
                 <div id = "2019-2020" class="seasonDropdown" display="none">
                     <br>
                     <div class="seasonTable"></div>
+                    <br>
+                    <canvas class = "graph"></canvas>
+                    <br>Links to Invoices:<br>
                     <div class="monthInformation"></div>
                 </div>
                 <button onclick="seasonDropDown('2020-2021')" class="dropdownbtn">2020-2021</button>
                 <div id = "2020-2021" class="seasonDropdown" display="none">
                     <br>
                     <div class="seasonTable"></div>
+                    <br>
+                    <canvas class = "graph"></canvas>
+                    <br>Links to Invoices:<br>
                     <div class="monthInformation"></div>
                 </div>
                 <button onclick="seasonDropDown('2021-2022')" class="dropdownbtn">2021-2022</button>
                 <div id = "2021-2022" class="seasonDropdown" display="none">
                     <br>
                     <div class="seasonTable"></div>
+                    <br>
+                    <canvas class = "graph"></canvas>
+                    <br>Links to Invoices:<br>
                     <div class="monthInformation"></div>
                 </div>
                 <button onclick="seasonDropDown('2022-2023')" class="dropdownbtn">2022-2023</button>
                 <div id = "2022-2023" class="seasonDropdown" display="none">
                     <br>
                     <div class="seasonTable"></div>
+                    <br>
+                    <canvas class = "graph"></canvas>
                     <br>Links to Invoices:<br>
                     <div class="monthInformation"></div>
                 </div>

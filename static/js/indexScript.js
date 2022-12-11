@@ -1,8 +1,5 @@
 var numSessions
-months = ["", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-headerRow = ['Month', 'PreCanskate (PCS)', 'Canskate (CS)', 'Funzone (FZ)', 'Novice (NV)', 'Junior (JR)', 'Performance Enrichment Program (PEP)', 'Adult (AD)', 
-                'Power Skate (PW)', 'Stroking (ST)', 'Canskate - Circuit Drawing (CIR)', 'Pre-Canskate/Canskate - Report Card (RPT)', 'Intermediate (IN)', 'Hours']
-var seasonArray = ["2019-2020","2020-2021","2021-2022","2022-2023"]
+
 let options = {
     "default": {
         "value": "Select Session"
@@ -224,7 +221,7 @@ function addSeasonTable(season,x){
             alert("server error "+ error.status + ": " + error.responseJSON.error)
         }
     }).done()
-    
+    graph(season)
 }
 
 function sortBasedOnHeader(header, season){
