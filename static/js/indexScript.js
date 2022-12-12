@@ -1,4 +1,5 @@
 var sessionDay = 0
+var lastImportDay = 0
 
 let options = {
     "default": {
@@ -831,6 +832,59 @@ function addSession(dayNum){
     onChange()
 }
 
+function addSessionImport(dayNum){
+    let mainDiv = document.getElementById("importday"+dayNum)
+    let newSession = document.createElement("div")
+    let dropDownSpan = document.createElement("span")
+    let numSpan = document.createElement("span")
+    let dropDownSelect = document.createElement("select")
+    let deleteButton = document.createElement("input")
+    dropDownSelect.setAttribute("name","import-session-type")
+    dropDownSelect.setAttribute("required", "")
+    dropDownSelect.setAttribute("class", "import-session-type"+dayNum)
+    newSession.setAttribute("class", "importday"+dayNum)
+
+    deleteButton.setAttribute("type", "button")
+    deleteButton.setAttribute("id","deleteSession")
+    deleteButton.setAttribute("value","Delete Session")
+    deleteButton.addEventListener("click",deleteSession)
+
+    newSession.appendChild(dropDownSpan)
+    newSession.appendChild(numSpan)
+    newSession.appendChild(deleteButton)
+    mainDiv.appendChild(newSession)
+    dropDownSpan.appendChild(dropDownSelect)
+
+
+    for (const [key, value] of Object.entries(options)){
+        dropDown = document.createElement("option")
+        if (key == "default"){
+            dropDown.setAttribute("value", "")
+            dropDown.setAttribute("selected","")
+            dropDown.setAttribute("disabled","")
+            dropDown.setAttribute("hidden","")
+        } else {
+            dropDown.setAttribute("value", key)
+            if (key == "IN" || key == "NV" || key == "JR" || key == "CIR" || key == "RPT" || key == "FZ"){
+                dropDown.setAttribute("class", key)
+            }
+        }
+        dropDown.innerHTML = value.value
+        dropDownSelect.appendChild(dropDown)
+ 
+    }
+
+    numInput = document.createElement("input")
+    numInput.setAttribute("name","import-session-amount")
+    numInput.setAttribute("type","number")
+    numInput.setAttribute("placeholder","Number of Sessions")
+    numInput.setAttribute("required","")
+    numInput.setAttribute("class","import-session-amount"+dayNum)
+    numSpan.appendChild(numInput)
+
+    onChange()
+}
+
 function addDay(){
     ++sessionDay
     parentDiv = document.getElementById("List-Of-Sessions")
@@ -917,7 +971,6 @@ function addDay(){
 }
 
 function submitForm(){
-    headers = {}
     data = {}
 
     for (i = 0; i <= sessionDay; i++){
@@ -932,9 +985,6 @@ function submitForm(){
         }
         data[date] = sessionsList
     }
-
-    console.log(data)
-
 
     var request = $.ajax({
         url: "/create",
@@ -996,26 +1046,61 @@ function uploadInvoice(){
             displayMonth.innerHTML = month
             calDiv.appendChild(displayMonth)
 
-            sessionDiv = document.createElement("div")
-            sessionDiv.setAttribute("id", "sessionsFromImport")
-            calDiv.appendChild(sessionDiv)
+            divContainer = document.createElement("div")
+            divContainer.setAttribute('id', "importContainer")
+            calDiv.appendChild(divContainer)
 
             //go through uploadCalendar dict from server
-            for (const [key, value] of Object.entries(response["uploadCalendar"])){
-                //semicolons separate between different session types in one day. # of semicolons - 1 = number of sessions in that day
-                valueArrayLength = value.split(";").length - 1
-                for (var x = 0; x < valueArrayLength; x++){
-                    newCalRow = document.createElement("div")
-                    newCalRow.setAttribute("id", "import"+i)
-                    sessionDiv.appendChild(newCalRow)
+            for (const [date, sessions] of Object.entries(response["uploadCalendar"])){
+                newCalRow = document.createElement("div")
+                newCalRow.setAttribute("id", "importday"+i)
+                newCalRow.setAttribute("class", "sessionDay")
+                //get what day the session occured and set that as default day. also sets min and max dates (based on the invoice month and year)
+                dateSpan = document.createElement("span")
+                newCalRow.appendChild(dateSpan)
+                dateInput = document.createElement("input")
+                dateInput.setAttribute("name","import-date-of-session")
+                dateInput.setAttribute("type","date")
+                dateInput.setAttribute("required","")
+                dateInput.setAttribute("class","import-date-of-session")
+
+                dateYear = response["uploadInfo"]["year"]
+
+                dateMonth = months.indexOf(response["uploadInfo"]["month"]).toString()
+                dateInput.setAttribute("value", date)
+                dateInput.setAttribute("min",dateYear+"-"+dateMonth+"-01")
+                dateInput.setAttribute("max",dateYear+"-"+dateMonth+"-"+getLastDay(dateMonth,dateYear))
+                dateSpan.appendChild(dateInput)
+
+                deleteDaySpan = document.createElement("span")
+                newCalRow.appendChild(deleteDaySpan)
+                deleteDayButton = document.createElement("input")
+                deleteDayButton.setAttribute("type", "button")
+                deleteDayButton.setAttribute("value", "Delete Day")
+                deleteDayButton.addEventListener("click", deleteDay)
+                deleteDaySpan.appendChild(deleteDayButton)
+
+                addSessionSpan = document.createElement("span")
+                newCalRow.appendChild(addSessionSpan)
+                addSessionButton = document.createElement("input")
+                addSessionButton.setAttribute("type", "button")
+                addSessionButton.setAttribute("value", "Add Session")
+                addSessionButton.setAttribute("onclick", "addSessionImport("+i+")")
+                addSessionSpan.appendChild(addSessionButton)
+
+                divContainer.appendChild(newCalRow)
+
+                for (const [x,session] of Object.entries(sessions)){
+                    infoDiv = document.createElement("div")
+                    infoDiv.setAttribute("class", "importday"+i)
+                    newCalRow.appendChild(infoDiv)
                     newSpan = document.createElement("span")
-                    newCalRow.appendChild(newSpan)
+                    infoDiv.appendChild(newSpan)
                     newDropDown = document.createElement("select")
                     newSpan.appendChild(newDropDown)
                     newDropDown.setAttribute("name", "import-session-type")
-                    newDropDown.setAttribute("class", "import-session-type")
+                    newDropDown.setAttribute("class", "import-session-type"+i)
                     newDropDown.setAttribute("required","")
-
                     //go through options dict for drop down. display default option if that's the session for that day. exclude options based on season
                     for (const [sessionValue, sessionName] of Object.entries(options)){
                         if (sessionValue != "default"){
@@ -1034,67 +1119,43 @@ function uploadInvoice(){
                                     newDropDown.appendChild(dropDown)
                                 }
                             }
-                            if (sessionValue == value.split(";")[x].split(" ")[0]){
+                            if (sessionValue == session["type"]){
                                 dropDown.setAttribute("selected","")
-                                i++
                             }
                         }
                     }
-                    
+
                     //get amount of session on that day and set that as default value
                     newSpanSessionAmount = document.createElement("span")
-                    newCalRow.appendChild(newSpanSessionAmount)
+                    infoDiv.appendChild(newSpanSessionAmount)
                     numInput = document.createElement("input")
                     newSpanSessionAmount.appendChild(numInput)
                     numInput.setAttribute("name","import-session-amount")
-                    numInput.setAttribute("class","import-session-amount")
+                    numInput.setAttribute("class","import-session-amount"+i)
                     numInput.setAttribute("type","number")
                     numInput.setAttribute("placeholder","Number of Sessions")
                     numInput.setAttribute("required","")
-                    numInput.setAttribute("value",value.split(";")[x].split(" ")[2])
+                    numInput.setAttribute("value",session["amount"])
                     
-                    //get what day the session occured and set that as default day. also sets min and max dates (based on the invoice month and year)
-                    dateSpan = document.createElement("span")
-                    newCalRow.appendChild(dateSpan)
-                    dateInput = document.createElement("input")
-                    dateInput.setAttribute("name","import-date-of-session")
-                    dateInput.setAttribute("type","date")
-                    dateInput.setAttribute("required","")
-                    dateInput.setAttribute("class","import-date-of-session")
-
-                    dateYear = response["uploadInfo"]["year"]
-
-                    dateMonth = months.indexOf(response["uploadInfo"]["month"]).toString()
-                    if (dateMonth.length == 1){
-                        dateMonth = "0"+dateMonth
-                    }
-                    dateDay = key.split(" ")[1]
-                    if (dateDay.length == 1){
-                        dateDay = "0"+dateDay
-                    }
-                    dateInput.setAttribute("value", dateYear+"-"+dateMonth+"-"+dateDay)
-                    dateInput.setAttribute("min",dateYear+"-"+dateMonth+"-01")
-                    dateInput.setAttribute("max",dateYear+"-"+dateMonth+"-"+getLastDay(dateMonth,dateYear))
-                    dateSpan.appendChild(dateInput)
-                    
-                    //add delete session button to delete session
                     deleteButton = document.createElement("input")
                     deleteButton.setAttribute("type", "button")
                     deleteButton.setAttribute("id","deleteSession")
                     deleteButton.setAttribute("value","Delete Session")
                     deleteButton.addEventListener("click",deleteSession)
-                    newCalRow.appendChild(deleteButton)
+                    infoDiv.appendChild(deleteButton)
 
                 }
+                ++i
+                lastImportDay = i
             }
-            
+
             //add button to add new sessions
             var addNewSession = document.createElement("input")
             calDiv.appendChild(addNewSession)
             addNewSession.setAttribute("type", "button")
-            addNewSession.setAttribute("id", "import-add-session")
+            addNewSession.setAttribute("id", "import-add-day")
             addNewSession.setAttribute("onclick", "newSession('"+response["uploadInfo"]["month"]+"',"+dateYear+")")
-            addNewSession.setAttribute("value", "Add Session")
+            addNewSession.setAttribute("value", "Add Day")
 
             //add button to submit changes to server
             var submitButton = document.createElement("input")
@@ -1102,7 +1163,6 @@ function uploadInvoice(){
             submitButton.setAttribute("type", "submit")
             submitButton.setAttribute("value", "Update")
             submitButton.setAttribute("onclick", "updateImport('"+response["uploadInfo"]["month"]+"',"+dateYear+",'"+response["uploadInfo"]["name"]+"','"+response["uploadInfo"]["rate"]+"')")
-            
         },
         error: function(error){
             alert("server error "+ error.status + ": " + error.responseJSON.error)
@@ -1111,22 +1171,62 @@ function uploadInvoice(){
 }
 
 function newSession(month, year){
-    sessionDiv = document.getElementById("sessionsFromImport")
+    sessionDiv = document.getElementById("importContainer")
     season = getSeason(year, month)
 
-    var addNewSession = document.createElement("div")
-    sessionDiv.appendChild(addNewSession)
+    newInfo = document.createElement("div")
+    sessionDiv.appendChild(newInfo)
+    newInfo.setAttribute("class", "sessionDay")
+
+    dateSpan = document.createElement("span")
+    newInfo.appendChild(dateSpan)
+    newInfo.setAttribute("id", "importday"+lastImportDay)
+    dateInput = document.createElement("input")
+    dateInput.setAttribute("name","import-date-of-session")
+    dateInput.setAttribute("type","date")
+    dateInput.setAttribute("required","")
+    dateInput.setAttribute("class","import-date-of-session")
+
+    dateMonth = months.indexOf(month).toString()
+    if (dateMonth.length == 1){
+        dateMonth = "0"+dateMonth
+    }
+    dateInput.setAttribute("min",year+"-"+dateMonth+"-01")
+    dateInput.setAttribute("max",year+"-"+dateMonth+"-"+getLastDay(dateMonth,year))
+    dateSpan.appendChild(dateInput)
+
+    deleteDaySpan = document.createElement("span")
+    newInfo.appendChild(deleteDaySpan)
+    deleteDayButton = document.createElement("input")
+    deleteDayButton.setAttribute("type", "button")
+    deleteDayButton.setAttribute("value", "Delete Day")
+    deleteDayButton.addEventListener("click", deleteDay)
+    deleteDaySpan.appendChild(deleteDayButton)
+
+    addSessionSpan = document.createElement("span")
+    newInfo.appendChild(addSessionSpan)
+    addSessionButton = document.createElement("input")
+    addSessionButton.setAttribute("type", "button")
+    addSessionButton.setAttribute("value", "Add Session")
+    addSessionButton.setAttribute("onclick", "addSessionImport("+lastImportDay+")")
+    addSessionSpan.appendChild(addSessionButton)
 
     monthIndex = months.indexOf(month).toString()
 
+    sessionInput = document.createElement("div")
+    sessionInput.setAttribute("class", "importday"+lastImportDay)
+
+    newInfo.appendChild(sessionInput)
+
     dropDownSpan = document.createElement("span")
-    addNewSession.appendChild(dropDownSpan)
+    sessionInput.appendChild(dropDownSpan)
     newDropDown = document.createElement("select")
     dropDownSpan.appendChild(newDropDown)
     newDropDown.setAttribute("name", "import-session-type")
-    newDropDown.setAttribute("class", "import-session-type")
+    newDropDown.setAttribute("class", "import-session-type"+lastImportDay)
     newDropDown.setAttribute("required","")
 
+    season = getSeason(year, month)
 
     for (const [sessionValue, sessionName] of Object.entries(options)){
         if (sessionValue != "default"){
@@ -1158,64 +1258,43 @@ function newSession(month, year){
     }
 
     newSpanSessionAmount = document.createElement("span")
-    addNewSession.appendChild(newSpanSessionAmount)
+    sessionInput.appendChild(newSpanSessionAmount)
     numInput = document.createElement("input")
     newSpanSessionAmount.appendChild(numInput)
     numInput.setAttribute("name","import-session-amount")
-    numInput.setAttribute("class","import-session-amount")
+    numInput.setAttribute("class","import-session-amount"+lastImportDay)
     numInput.setAttribute("type","number")
     numInput.setAttribute("placeholder","Number of Sessions")
     numInput.setAttribute("required","")
 
-    dateSpan = document.createElement("span")
-    addNewSession.appendChild(dateSpan)
-    dateInput = document.createElement("input")
-    dateInput.setAttribute("name","import-date-of-session")
-    dateInput.setAttribute("type","date")
-    dateInput.setAttribute("required","")
-    dateInput.setAttribute("class","import-date-of-session")
-
-    dateMonth = months.indexOf(month).toString()
-    if (dateMonth.length == 1){
-        dateMonth = "0"+dateMonth
-    }
-    dateInput.setAttribute("min",year+"-"+dateMonth+"-01")
-    dateInput.setAttribute("max",year+"-"+dateMonth+"-"+getLastDay(dateMonth,year))
-    dateSpan.appendChild(dateInput)
-    
-    //add delete session button to delete session
-    deleteButton = document.createElement("input")
-    deleteButton.setAttribute("type", "button")
-    deleteButton.setAttribute("id","deleteSession")
-    deleteButton.setAttribute("value","Delete Session")
-    deleteButton.addEventListener("click",deleteSession)
-    addNewSession.appendChild(deleteButton)
-
+    ++lastImportDay
 }
 
 function updateImport(month, year, name, rate){
-    selectedSessions = document.getElementsByClassName("import-session-type")
-    selectedAmounts = document.getElementsByClassName("import-session-amount")
-    selectedDates = document.getElementsByClassName("import-date-of-session")
+    data = {}
 
-    sessions = [], amounts = [], dates = []
-
-    for (var i = 0; i < selectedSessions.length; i++){
-        sessions.push(selectedSessions[i].value)
-        amounts.push(selectedAmounts[i].value)
-        dates.push(selectedDates[i].value)
+    for (i = 0; i < lastImportDay; i++){
+        sessionsList = {}
+        date = document.getElementsByClassName("import-date-of-session")[i].value
+        sessions = document.getElementsByClassName("importday"+i)
+        sessionSelect = document.getElementsByClassName("import-session-type"+i)
+        sessionAmount = document.getElementsByClassName("import-session-amount"+i)
+        for (x = 0; x < sessions.length; x ++){
+            console.log(x)
+            text = "session"+x
+            sessionsList[text] = {"type": sessionSelect[x].value, "amount": sessionAmount[x].value}
+        }
+        data[date] = sessionsList
     }
 
     season = getSeason(year, month)
 
-    data = {"season": season, "month": month, "sessions": sessions, "amount": amounts, "date": dates, "name": name, "rate": rate, "comments": ""}
-    console.log(data)
-
     var request = $.ajax({
         url: "/updateImport",
         type: "POST",
-        processData: false,
-        contentType: false,
+        headers: {"season": season, "month": month, 
+        "name": name, "rate": rate, "comments": ""},
+        contentType: "application/json",
         data: JSON.stringify(data),
         success: function(response){
             today = new Date()

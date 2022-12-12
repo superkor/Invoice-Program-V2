@@ -22,7 +22,7 @@ TODO
 - Add option to sessions that user covered someone
 - Change amount of sessions on calendar to amount of minutes
 - Add update/edit function for an existing invoice
-- Add some data analysis in summary
+⌛ Add some data analysis in summary (added graph; will add more analysis)
 """
 
 @app.route("/")
@@ -125,50 +125,30 @@ def sortInvoice():
 
 @app.route("/importInvoice", methods=["POST"])
 def importInvoice():
-    try:
-        file = request.files['inputInvoice']
-        filename = (secure_filename(file.filename))
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'],filename))
-        uploadInvoice = upload.invoiceUpload(filename)
-        season = uploadInvoice.getSeason()
-        uploadInvoice.openUploadedFile()
-        uploadInfo = uploadInvoice.getUploadedInvoiceInfo()
-        #print(uploadInfo)
-        uploadCalendar = uploadInvoice.getCalendar()
-        #print(uploadCalendar)
-        uploadInvoice.updateDatabase()
-        return jsonify({"success": "true", "season": season, "uploadInfo": uploadInfo, "uploadCalendar": uploadCalendar}), 200
-    except Exception as e:
-        return jsonify({"success": "false", "error": str(e)}), 500
+    """     try: """
+    file = request.files['inputInvoice']
+    filename = (secure_filename(file.filename))
+    file.save(os.path.join(app.config['UPLOAD_FOLDER'],filename))
+    uploadInvoice = upload.invoiceUpload(filename)
+    season = uploadInvoice.getSeason()
+    uploadInvoice.openUploadedFile()
+    uploadInfo = uploadInvoice.getUploadedInvoiceInfo()
+    uploadCalendar = uploadInvoice.getCalendar()
+    uploadInvoice.updateDatabase()
+    return jsonify({"success": "true", "season": season, "uploadInfo": uploadInfo, "uploadCalendar": uploadCalendar}), 200
+    """ except Exception as e:
+        return jsonify({"success": "false", "error": str(e)}), 500 """
 
 @app.route("/updateImport", methods=["POST"])
 def updateImport():
     #Add comments later
     #comments = request.args.get("comments")
     data = json.loads(request.data, strict=False)
-    season = data["season"]
-    month = data["month"]
-    listSessions = data["sessions"]
-    listSessionsAmount = data["amount"]
-    listSessionsDate = data["date"]
-    comments = data["comments"]
-    name = data["name"]
-    rate = data["rate"]
-
-    numberSessions = len(listSessions)
-    numberAmount = len(listSessionsAmount)
-    numberDate = len(listSessionsDate)
-
-    #raise 400 if session data array doesn't have the same length
-    if (numberAmount != numberSessions or numberSessions != numberDate):
-        abort(400, description="Sessions has missing data "+ str({"session-type": listSessions, "sessions-amount": listSessionsAmount, "date-of-session": listSessionsDate}))
-    elif (numberAmount == 0 or numberSessions == 0 or numberDate == 0):
-        abort(400, description= "Empty query")
-
-    sessions = {}
-    #creating dict of sessions
-    for x in range (numberSessions):
-        sessions["session"+str(x)] = {"type": listSessions[x], "amount": listSessionsAmount[x], "date": listSessionsDate[x]}
+    season = request.headers["season"]
+    month = request.headers["month"]
+    comments = request.headers["comments"]
+    name = request.headers["name"]
+    rate = request.headers["rate"]
 
     if comments == None:
         comments = ""
@@ -177,7 +157,7 @@ def updateImport():
         "season": season,
         "month": month,
         "comments": comments,
-        "sessions": sessions,
+        "sessions": data,
         "name": name,
         "rate": rate
     }

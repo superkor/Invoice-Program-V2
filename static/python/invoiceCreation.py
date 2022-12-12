@@ -297,6 +297,17 @@ class createInvoice:
             return (date.date(int(self.year), self.monthArray.index(self.month)+2, 1) - date.timedelta(days=1)).day
     
     """
+    Returns month number from given month
+    """
+    def getMonthNum(self):
+        if len(str(self.monthArray.index(self.month)+1)) == 1:
+            monthNum = "0" + str(self.monthArray.index(self.month)+1)
+        else:
+            monthNum = str(self.monthArray.index(self.month)+1)
+        
+        return monthNum
+
+    """
     Gets what session has been done on the day given.
     Arguments:
         day (int) - day of the month
@@ -307,10 +318,7 @@ class createInvoice:
             #lol
             day = str("0"+str(day))
         
-        if len(str(self.monthArray.index(self.month)+1)) == 1:
-            month = "0" + str(self.monthArray.index(self.month)+1)
-        else:
-            month = str(self.monthArray.index(self.month)+1)
+        month = self.getMonthNum()
         
         getDayDict = {}
         
