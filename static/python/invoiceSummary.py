@@ -174,32 +174,37 @@ class summaryInvoice:
                 """
                 pcs = cs = fz = nv = jr = pep = ad = pw = st = cir = rpt = inter = hours = 0
 
-                numberSessions = len(sessions)
-                for x in range(numberSessions):
-                    if sessions[f"session{x}"]["type"] == "PCS":
-                        pcs+=int(sessions[f"session{x}"]["amount"])
-                    elif sessions[f"session{x}"]["type"] == "CS":
-                        cs+=int(sessions[f"session{x}"]["amount"])
-                    elif sessions[f"session{x}"]["type"] == "FZ":
-                        fz+=int(sessions[f"session{x}"]["amount"])
-                    elif sessions[f"session{x}"]["type"] == "NV":
-                        nv+=int(sessions[f"session{x}"]["amount"])
-                    elif sessions[f"session{x}"]["type"] == "JR":
-                        jr+=int(sessions[f"session{x}"]["amount"])
-                    elif sessions[f"session{x}"]["type"] == "PEP":
-                        pep+=int(sessions[f"session{x}"]["amount"])
-                    elif sessions[f"session{x}"]["type"] == "AD":
-                        ad+=int(sessions[f"session{x}"]["amount"])
-                    elif sessions[f"session{x}"]["type"] == "PW":
-                        pw+=int(sessions[f"session{x}"]["amount"])
-                    elif sessions[f"session{x}"]["type"] == "ST":
-                        st+=int(sessions[f"session{x}"]["amount"])
-                    elif sessions[f"session{x}"]["type"] == "CIR":
-                        cir+=int(sessions[f"session{x}"]["amount"])
-                    elif sessions[f"session{x}"]["type"] == "RPT":
-                        rpt+=int(sessions[f"session{x}"]["amount"])
-                    elif sessions[f"session{x}"]["type"] == "IN":
-                        inter+=int(sessions[f"session{x}"]["amount"])
+                #get number of days
+                numberDays = len(list(sessions))
+                days = list(sessions)
+
+                for y in range(numberDays):
+                    numberSessions = len(sessions[list(sessions)[y]])
+                    for x in range(numberSessions):
+                        if sessions[days[y]][f"session{x}"]["type"] == "PCS":
+                            pcs+=int(sessions[days[y]][f"session{x}"]["amount"])
+                        elif sessions[days[y]][f"session{x}"]["type"] == "CS":
+                            cs+=int(sessions[days[y]][f"session{x}"]["amount"])
+                        elif sessions[days[y]][f"session{x}"]["type"] == "FZ":
+                            fz+=int(sessions[days[y]][f"session{x}"]["amount"])
+                        elif sessions[days[y]][f"session{x}"]["type"] == "NV":
+                            nv+=int(sessions[days[y]][f"session{x}"]["amount"])
+                        elif sessions[days[y]][f"session{x}"]["type"] == "JR":
+                            jr+=int(sessions[days[y]][f"session{x}"]["amount"])
+                        elif sessions[days[y]][f"session{x}"]["type"] == "PEP":
+                            pep+=int(sessions[days[y]][f"session{x}"]["amount"])
+                        elif sessions[days[y]][f"session{x}"]["type"] == "AD":
+                            ad+=int(sessions[days[y]][f"session{x}"]["amount"])
+                        elif sessions[days[y]][f"session{x}"]["type"] == "PW":
+                            pw+=int(sessions[days[y]][f"session{x}"]["amount"])
+                        elif sessions[days[y]][f"session{x}"]["type"] == "ST":
+                            st+=int(sessions[days[y]][f"session{x}"]["amount"])
+                        elif sessions[days[y]][f"session{x}"]["type"] == "CIR":
+                            cir+=int(sessions[days[y]][f"session{x}"]["amount"])
+                        elif sessions[days[y]][f"session{x}"]["type"] == "RPT":
+                            rpt+=int(sessions[days[y]][f"session{x}"]["amount"])
+                        elif sessions[days[y]][f"session{x}"]["type"] == "IN":
+                            inter+=int(sessions[days[y]][f"session{x}"]["amount"])
 
                     hours = (pcs*50+cs*30+fz*15+nv*10+jr*10+pep*30+ad*50+pw*60+st*10+cir*5+rpt*10+inter*10)/60
                 self.mycursor.execute(insertIntoTable, (season, months, pcs, cs, fz, nv, jr, pep, ad, pw, st, cir, rpt, inter, hours))
@@ -212,32 +217,37 @@ class summaryInvoice:
                 """
                 pcs = cs = fz = nv = jr = pep = ad = pw = st = cir = rpt = inter = hours = 0
 
-                numberSessions = len(sessions)
-                for x in range(numberSessions):
-                    if sessions[f"session{x}"]["type"] == "PCS":
-                        pcs+=int(sessions[f"session{x}"]["amount"])
-                    elif sessions[f"session{x}"]["type"] == "CS":
-                        cs+=int(sessions[f"session{x}"]["amount"])
-                    elif sessions[f"session{x}"]["type"] == "FZ":
-                        fz+=int(sessions[f"session{x}"]["amount"])
-                    elif sessions[f"session{x}"]["type"] == "NV":
-                        nv+=int(sessions[f"session{x}"]["amount"])
-                    elif sessions[f"session{x}"]["type"] == "JR":
-                        jr+=int(sessions[f"session{x}"]["amount"])
-                    elif sessions[f"session{x}"]["type"] == "PEP":
-                        pep+=int(sessions[f"session{x}"]["amount"])
-                    elif sessions[f"session{x}"]["type"] == "AD":
-                        ad+=int(sessions[f"session{x}"]["amount"])
-                    elif sessions[f"session{x}"]["type"] == "PW":
-                        pw+=int(sessions[f"session{x}"]["amount"])
-                    elif sessions[f"session{x}"]["type"] == "ST":
-                        st+=int(sessions[f"session{x}"]["amount"])
-                    elif sessions[f"session{x}"]["type"] == "CIR":
-                        cir+=int(sessions[f"session{x}"]["amount"])
-                    elif sessions[f"session{x}"]["type"] == "RPT":
-                        rpt+=int(sessions[f"session{x}"]["amount"])
-                    elif sessions[f"session{x}"]["type"] == "IN":
-                        inter+=int(sessions[f"session{x}"]["amount"])
+                #get number of days
+                numberDays = len(list(sessions))
+                days = list(sessions)
+
+                for y in range(numberDays):
+                    numberSessions = len(sessions[list(sessions)[y]])
+                    for x in range(numberSessions):
+                        if sessions[days[y]][f"session{x}"]["type"] == "PCS":
+                            pcs+=int(sessions[days[y]][f"session{x}"]["amount"])
+                        elif sessions[days[y]][f"session{x}"]["type"] == "CS":
+                            cs+=int(sessions[days[y]][f"session{x}"]["amount"])
+                        elif sessions[days[y]][f"session{x}"]["type"] == "FZ":
+                            fz+=int(sessions[days[y]][f"session{x}"]["amount"])
+                        elif sessions[days[y]][f"session{x}"]["type"] == "NV":
+                            nv+=int(sessions[days[y]][f"session{x}"]["amount"])
+                        elif sessions[days[y]][f"session{x}"]["type"] == "JR":
+                            jr+=int(sessions[days[y]][f"session{x}"]["amount"])
+                        elif sessions[days[y]][f"session{x}"]["type"] == "PEP":
+                            pep+=int(sessions[days[y]][f"session{x}"]["amount"])
+                        elif sessions[days[y]][f"session{x}"]["type"] == "AD":
+                            ad+=int(sessions[days[y]][f"session{x}"]["amount"])
+                        elif sessions[days[y]][f"session{x}"]["type"] == "PW":
+                            pw+=int(sessions[days[y]][f"session{x}"]["amount"])
+                        elif sessions[days[y]][f"session{x}"]["type"] == "ST":
+                            st+=int(sessions[days[y]][f"session{x}"]["amount"])
+                        elif sessions[days[y]][f"session{x}"]["type"] == "CIR":
+                            cir+=int(sessions[days[y]][f"session{x}"]["amount"])
+                        elif sessions[days[y]][f"session{x}"]["type"] == "RPT":
+                            rpt+=int(sessions[days[y]][f"session{x}"]["amount"])
+                        elif sessions[days[y]][f"session{x}"]["type"] == "IN":
+                            inter+=int(sessions[days[y]][f"session{x}"]["amount"])
 
                 hours = (pcs*50+cs*30+fz*15+nv*10+jr*10+pep*30+ad*50+pw*60+st*10+cir*5+rpt*10+inter*10)/60
                 self.mycursor.execute(insertIntoTable, (season, pcs, cs, fz, nv, jr, pep, ad, pw, st, cir, rpt, inter, hours, months))

@@ -104,3 +104,7 @@ body {font-family: Verdana;}
     transform: rotate(45deg);
     -webkit-transform: rotate(45deg);
   }
+
+  .sessionDay {
+    border: #c21fba 3px solid;
+  }

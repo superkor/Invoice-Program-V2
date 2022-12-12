@@ -1,4 +1,4 @@
-var numSessions
+var sessionDay = 0
 
 let options = {
     "default": {
@@ -680,6 +680,8 @@ function onChange() {
     rptSession = document.getElementsByClassName("RPT")
     fzSession = document.getElementsByClassName("FZ")
 
+    numSessions = document.getElementsByClassName("sessionSelect").length
+
     if (season == "2022-2023"){
         for (var i = 0; i < numSessions; i++){
             inSession[i].setAttribute("disabled","")
@@ -771,17 +773,22 @@ function deleteSession(event){
     event.target.parentNode.remove()
 }
 
-function addSession(){
+function deleteDay(event){
+    //gets the button that was clicked on and removes parent div
+    event.target.parentNode.parentNode.remove()
+}
 
-    let mainDiv = document.getElementById("List-Of-Sessions")
+function addSession(dayNum){
+    let mainDiv = document.getElementById("day"+dayNum)
     let newSession = document.createElement("div")
     let dropDownSpan = document.createElement("span")
     let numSpan = document.createElement("span")
-    let dateSpan = document.createElement("span")
     let dropDownSelect = document.createElement("select")
     let deleteButton = document.createElement("input")
     dropDownSelect.setAttribute("name","session-type")
     dropDownSelect.setAttribute("required", "")
+    dropDownSelect.setAttribute("class", "sessionSelect"+dayNum+ " sessionSelect")
+    newSession.setAttribute("class", "day"+dayNum)
 
     deleteButton.setAttribute("type", "button")
     deleteButton.setAttribute("id","deleteSession")
@@ -790,7 +797,6 @@ function addSession(){
 
     newSession.appendChild(dropDownSpan)
     newSession.appendChild(numSpan)
-    newSession.appendChild(dateSpan)
     newSession.appendChild(deleteButton)
     mainDiv.appendChild(newSession)
     dropDownSpan.appendChild(dropDownSelect)
@@ -819,27 +825,124 @@ function addSession(){
     numInput.setAttribute("type","number")
     numInput.setAttribute("placeholder","Number of Sessions")
     numInput.setAttribute("required","")
+    numInput.setAttribute("class","sessionAmount"+dayNum)
     numSpan.appendChild(numInput)
 
+    onChange()
+}
+
+function addDay(){
+    ++sessionDay
+    parentDiv = document.getElementById("List-Of-Sessions")
+    newDayDiv = document.createElement("div")
+    newDayDiv.setAttribute("id", "day"+sessionDay)
+    newDayDiv.setAttribute('class', 'sessionDay')
+    parentDiv.appendChild(newDayDiv)
+
+    //Create day input
+    let dateSpan = document.createElement("span")
     dateInput = document.createElement("input")
     dateInput.setAttribute("name","date-of-session")
     dateInput.setAttribute("type","date")
     dateInput.setAttribute("required","")
     dateInput.setAttribute("class","dateSelection")
     dateSpan.appendChild(dateInput)
+    newDayDiv.appendChild(dateSpan)
 
-    newSession.setAttribute("id","Session"+numSessions)
-    ++numSessions
+    //Create Delete day input
+    let deleteDaySpan = document.createElement('span')
+    deleteInput = document.createElement("input")
+    deleteInput.setAttribute("value","Delete Day")
+    deleteInput.setAttribute("type","button")
+    deleteInput.addEventListener("click",deleteDay)
+    deleteDaySpan.appendChild(deleteInput)
+    newDayDiv.appendChild(deleteDaySpan)
+
+    //Create Add Sessions Button input
+    let addSpan = document.createElement('span')
+    addInput = document.createElement('input')
+    addSpan.setAttribute('id', 'AddSession'+sessionDay)
+    addInput.setAttribute('type', 'button')
+    addInput.setAttribute('name', 'add-session')
+    addInput.setAttribute('value', 'Add Session')
+    addInput.setAttribute('onclick', 'addSession("'+sessionDay+'")')
+
+    addSpan.appendChild(addInput)
+    newDayDiv.appendChild(addSpan)
+
+    //create entry for new session under the day
+    let newSession = document.createElement("div")
+    let dropDownSpan = document.createElement("span")
+    let numSpan = document.createElement("span")
+    let dropDownSelect = document.createElement("select")
+    newSession.setAttribute("class", "day"+sessionDay)
+    dropDownSelect.setAttribute("name","session-type")
+    dropDownSelect.setAttribute("required", "")
+    dropDownSelect.setAttribute("class", "sessionSelect"+sessionDay+ " sessionSelect")
+
+    newSession.appendChild(dropDownSpan)
+    newSession.appendChild(numSpan)
+    newDayDiv.appendChild(newSession)
+    dropDownSpan.appendChild(dropDownSelect)
+
+
+    for (const [key, value] of Object.entries(options)){
+        dropDown = document.createElement("option")
+        if (key == "default"){
+            dropDown.setAttribute("value", "")
+            dropDown.setAttribute("selected","")
+            dropDown.setAttribute("disabled","")
+            dropDown.setAttribute("hidden","")
+        } else {
+            dropDown.setAttribute("value", key)
+            if (key == "IN" || key == "NV" || key == "JR" || key == "CIR" || key == "RPT" || key == "FZ"){
+                dropDown.setAttribute("class", key)
+            }
+        }
+        dropDown.innerHTML = value.value
+        dropDownSelect.appendChild(dropDown)
+ 
+    }
+
+    numInput = document.createElement("input")
+    numInput.setAttribute("name","session-amount")
+    numInput.setAttribute("type","number")
+    numInput.setAttribute("placeholder","Number of Sessions")
+    numInput.setAttribute("required","")
+    numInput.setAttribute("class","sessionAmount"+sessionDay)
+    numSpan.appendChild(numInput)
+
     onChange()
+
 }
 
-function createInvoice(){
-    //After user clicks Confirm button on Confirm Input page an invoice will be created.
+function submitForm(){
+    headers = {}
+    data = {}
+
+    for (i = 0; i <= sessionDay; i++){
+        sessionsList = {}
+        date = document.getElementsByClassName("dateSelection")[i].value
+        sessions = document.getElementsByClassName("day"+i)
+        sessionSelect = document.getElementsByClassName("sessionSelect"+i)
+        sessionAmount = document.getElementsByClassName("sessionAmount"+i)
+        for (x = 0; x < sessions.length; x ++){
+            text = "session"+x
+            sessionsList[text] = {"type": sessionSelect[x].value, "amount": sessionAmount[x].value}
+        }
+        data[date] = sessionsList
+    }
+
+    console.log(data)
+
+
     var request = $.ajax({
-        url: "/createInvoice",
+        url: "/create",
         type: "POST",
+        headers: {"season": document.getElementsByName("season")[0].value, "month": document.getElementsByName("month")[0].value, 
+        "name": document.getElementsByName("name")[0].value, "rate": document.getElementsByName("rate")[0].value, "comments": document.getElementsByName("comments")[0].value},
         contentType: "application/json",
-        data: {},
+        data: JSON.stringify(data),
         success: function(response){
             today = new Date()
             //set cookie expiry 30 mins after current datetime
