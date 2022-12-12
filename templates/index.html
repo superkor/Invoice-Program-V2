@@ -30,7 +30,7 @@
             </div>
     
             <div id="create" class="tabcontent" style="display:block">
-                <form action="create" method="GET" enctype="multipart/form-data">
+                <div id = 'form'>
                     <div id = "SeasonDiv">
                         <label for="season">Season</label>
                         <!-- Will add a function to populate seasons based on what invoice template exists -->
@@ -62,40 +62,45 @@
                         <textarea name="comments" id="comments" rows="4" cols="50" style="white-space: pre-wrap"></textarea>
                     </div>
                     <div id = "List-Of-Sessions">
-                        <div id = "Session0">
-                            <span>
-                                <select name = "session-type" required>
-                                    <option value="" selected disabled hidden>Select Session</option>
-                                    <option value="PCS">Pre-Canskate (PCS)</option>
-                                    <option value="CS" >Canskate (CS)</option>
-                                    <option value="FZ" class = "FZ">Fun Zone (FZ)</option>
-                                    <option value="IN" class = "IN" disabled hidden>Intermediate (IN)</option>
-                                    <option value="NV" class = "NV">Novice (NV)</option>
-                                    <option value="JR" class = "JR">Junior (JR)</option>
-                                    <option value="PEP">Performance Enrichment Program (PEP)</option>
-                                    <option value="AD">Adult (AD)</option>
-                                    <option value="PW">Power (PW)</option>
-                                    <option value="ST">Stroking (ST)</option>
-                                    <option value="CIR" class = "CIR">Canskate - Circuit Drawing (CIR)</option>
-                                    <option value="RPT" class = "RPT">Pre-Canskate/Canskate - Report Card (RPT)</option>
-                                </select>
-                            </span>
-                            <span>
-                                <input type="number" name="session-amount" placeholder="Number of Sessions" required>
-                            </span>
+                        <div id = "day0" class = "sessionDay" style="position: relative;">
                             <span>
                                 <input type="date" name="date-of-session" class = "dateSelection" required>
                             </span>
+                            <span id="AddSession0">
+                                <input type="button" name="add-session" value = "Add Session" onclick="addSession('0')">
+                            </span>
+                            <div class = "day0">
+                                <span>
+                                    <select name = "session-type" class = "sessionSelect0 sessionSelect" required>
+                                        <option value="" selected disabled hidden>Select Session</option>
+                                        <option value="PCS">Pre-Canskate (PCS)</option>
+                                        <option value="CS" >Canskate (CS)</option>
+                                        <option value="FZ" class = "FZ">Fun Zone (FZ)</option>
+                                        <option value="IN" class = "IN" disabled hidden>Intermediate (IN)</option>
+                                        <option value="NV" class = "NV">Novice (NV)</option>
+                                        <option value="JR" class = "JR">Junior (JR)</option>
+                                        <option value="PEP">Performance Enrichment Program (PEP)</option>
+                                        <option value="AD">Adult (AD)</option>
+                                        <option value="PW">Power (PW)</option>
+                                        <option value="ST">Stroking (ST)</option>
+                                        <option value="CIR" class = "CIR">Canskate - Circuit Drawing (CIR)</option>
+                                        <option value="RPT" class = "RPT">Pre-Canskate/Canskate - Report Card (RPT)</option>
+                                    </select>
+                                </span>
+                                <span>
+                                    <input type="number" name="session-amount" placeholder="Number of Sessions" class = "sessionAmount0" required>
+                                </span>
+                            </div>
                         </div>
                     </div>
                     <!-- addSession() on button adds new div to add new sessions. each new session div will have a delete button that will delete the created session div -->
-                    <div id="AddSession">
-                        <input type="button" name="add-session" value = "Add Session" onclick="addSession()">
+                    <div id="AddDay">
+                        <input type="button" name="add-day" value = "Add Day" onclick="addDay()">
                     </div>
                     <div>
-                        <input type="submit" value="Submit">
+                        <input type="submit" value="Submit" onclick="submitForm()">
                     </div>
-                </form>
+                </div>
             </div>
     
             <div id="summary" class="tabcontent">
@@ -158,27 +163,5 @@
             </div>
             
         </div>
-
-        <!-- Confirmation div after input for Invoice Creation -->
-        <div id = "fromCreate" style="display:none">
-            <!-- Sent input data -->
-            <h1>Confirm Input</h1>
-            <div>
-                <h5>Season</h5>
-                <p>{{ season }}</p>
-                <h5>Month</h5>
-                <p>{{ month }}</p>
-                <h5>Name</h5>
-                <p>{{ name }}</p>
-                <h5>Rate</h5>
-                <p>{{ rate }}</p>
-                <h5>Comments</h5>
-                <p>{{ comments }}</p>
-                <h5>Sessions</h5>
-                <div id="result">{{ sessions }}</div>
-            </div>
-            <input type="button" id="confirmButton" value="Confirm" onClick="createInvoice()">
-            <input type="button" id="cancelButton" value="Cancel" onClick="window.location.href='{{url_for('home')}}'">
-        </div>      
     </body>
 </html>

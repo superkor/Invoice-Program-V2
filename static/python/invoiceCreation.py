@@ -27,6 +27,10 @@ class createInvoice:
         self.rate = rate
         self.comments = comments
         self.sessions = sessions
+        
+        #get number of days
+        self.numberDays = len(list(self.sessions))
+        self.days = list(self.sessions)
 
     """
     Returns invoice output path (string)
@@ -56,32 +60,34 @@ class createInvoice:
     Gets total number of sessions of all possible session values set by user
     """
     def setValues(self):
-        numberSessions = len(self.sessions)
-        for x in range(numberSessions):
-            if self.sessions[f"session{x}"]["type"] == "PCS":
-                self.pcs+=int(self.sessions[f"session{x}"]["amount"])
-            elif self.sessions[f"session{x}"]["type"] == "CS":
-                self.cs+=int(self.sessions[f"session{x}"]["amount"])
-            elif self.sessions[f"session{x}"]["type"] == "FZ":
-                self.fz+=int(self.sessions[f"session{x}"]["amount"])
-            elif self.sessions[f"session{x}"]["type"] == "NV":
-                self.nv+=int(self.sessions[f"session{x}"]["amount"])
-            elif self.sessions[f"session{x}"]["type"] == "JR":
-                self.jr+=int(self.sessions[f"session{x}"]["amount"])
-            elif self.sessions[f"session{x}"]["type"] == "PEP":
-                self.pep+=int(self.sessions[f"session{x}"]["amount"])
-            elif self.sessions[f"session{x}"]["type"] == "AD":
-                self.ad+=int(self.sessions[f"session{x}"]["amount"])
-            elif self.sessions[f"session{x}"]["type"] == "PW":
-                self.pw+=int(self.sessions[f"session{x}"]["amount"])
-            elif self.sessions[f"session{x}"]["type"] == "ST":
-                self.st+=int(self.sessions[f"session{x}"]["amount"])
-            elif self.sessions[f"session{x}"]["type"] == "CIR":
-                self.cir+=int(self.sessions[f"session{x}"]["amount"])
-            elif self.sessions[f"session{x}"]["type"] == "RPT":
-                self.rpt+=int(self.sessions[f"session{x}"]["amount"])
-            elif self.sessions[f"session{x}"]["type"] == "IN":
-                self.inter+=int(self.sessions[f"session{x}"]["amount"])
+        
+        for y in range(self.numberDays):
+            numberSessions = len(self.sessions[list(self.sessions)[y]])
+            for x in range(numberSessions):
+                if self.sessions[self.days[y]][f"session{x}"]["type"] == "PCS":
+                    self.pcs+=int(self.sessions[self.days[y]][f"session{x}"]["amount"])
+                elif self.sessions[self.days[y]][f"session{x}"]["type"] == "CS":
+                    self.cs+=int(self.sessions[self.days[y]][f"session{x}"]["amount"])
+                elif self.sessions[self.days[y]][f"session{x}"]["type"] == "FZ":
+                    self.fz+=int(self.sessions[self.days[y]][f"session{x}"]["amount"])
+                elif self.sessions[self.days[y]][f"session{x}"]["type"] == "NV":
+                    self.nv+=int(self.sessions[self.days[y]][f"session{x}"]["amount"])
+                elif self.sessions[self.days[y]][f"session{x}"]["type"] == "JR":
+                    self.jr+=int(self.sessions[self.days[y]][f"session{x}"]["amount"])
+                elif self.sessions[self.days[y]][f"session{x}"]["type"] == "PEP":
+                    self.pep+=int(self.sessions[self.days[y]][f"session{x}"]["amount"])
+                elif self.sessions[self.days[y]][f"session{x}"]["type"] == "AD":
+                    self.ad+=int(self.sessions[self.days[y]][f"session{x}"]["amount"])
+                elif self.sessions[self.days[y]][f"session{x}"]["type"] == "PW":
+                    self.pw+=int(self.sessions[self.days[y]][f"session{x}"]["amount"])
+                elif self.sessions[self.days[y]][f"session{x}"]["type"] == "ST":
+                    self.st+=int(self.sessions[self.days[y]][f"session{x}"]["amount"])
+                elif self.sessions[self.days[y]][f"session{x}"]["type"] == "CIR":
+                    self.cir+=int(self.sessions[self.days[y]][f"session{x}"]["amount"])
+                elif self.sessions[self.days[y]][f"session{x}"]["type"] == "RPT":
+                    self.rpt+=int(self.sessions[self.days[y]][f"session{x}"]["amount"])
+                elif self.sessions[self.days[y]][f"session{x}"]["type"] == "IN":
+                    self.inter+=int(self.sessions[self.days[y]][f"session{x}"]["amount"])
     
     """
     Fills in the information on the Timesheet spreadsheet
@@ -296,14 +302,24 @@ class createInvoice:
         day (int) - day of the month
     """
     def getSessionOnDay(self, day: int):
-        numberSessions = len(self.sessions)
         exportDict = {}
-        for x in range(numberSessions):
-            #get the day from the date of the session
-            if int(self.sessions[f"session{x}"]["date"].split("-")[2]) == day:
+        if len(str(day)) == 1:
+            #lol
+            day = str("0"+str(day))
+        
+        if len(str(self.monthArray.index(self.month)+1)) == 1:
+            month = "0" + str(self.monthArray.index(self.month)+1)
+        else:
+            month = str(self.monthArray.index(self.month)+1)
+        
+        getDayDict = {}
+        
+        if f"{self.year}-{month}-{day}" in self.sessions:
+            getDayDict = self.sessions[f"{self.year}-{month}-{day}"]
+            for x in getDayDict:
                 #check if session is already in exportDict
-                if self.sessions[f"session{x}"]["type"] in exportDict:
-                    exportDict[self.sessions[f"session{x}"]["type"]] = str(int(exportDict[self.sessions[f"session{x}"]["type"]]) + int(self.sessions[f"session{x}"]["amount"]))
+                if getDayDict[x]['type'] in exportDict:
+                    exportDict[getDayDict[x]['type']] += getDayDict[x]['amount']
                 else:
-                    exportDict.update({self.sessions[f"session{x}"]["type"]:self.sessions[f"session{x}"]["amount"]})
+                    exportDict.update({getDayDict[x]['type']:getDayDict[x]['amount']})
         return(exportDict)

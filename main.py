@@ -29,66 +29,55 @@ TODO
 def home():
     return render_template('index.html')
 
-@app.route("/create", methods=["GET"])
-def getInfo():
-    season = request.args.get('season')
-    month = request.args.get('month')
-    name=request.args.get("name")
-    rate=request.args.get("rate")
-    comments = request.args.get("comments")
-    listSessions = request.args.getlist("session-type")
-    listSessionsAmount = request.args.getlist("session-amount")
-    listSessionsDate = request.args.getlist("date-of-session")
+@app.route("/create", methods=["POST"])
+def create():
+    try:
+        season = request.headers['season']
+        month = request.headers['month']
+        name=request.headers["name"]
+        rate=request.headers["rate"]
+        comments = request.headers["comments"]
+        data = json.loads(request.data, strict=False)
 
-    numberSessions = len(listSessions)
-    numberAmount = len(listSessionsAmount)
-    numberDate = len(listSessionsDate)
+        if comments == None:
+            comments = ""
 
-    #raise 400 if session data array doesn't have the same length
-    if (numberAmount != numberSessions or numberSessions != numberDate):
-        abort(400, description="Sessions has missing data "+ str({"session-type": listSessions, "sessions-amount": listSessionsAmount, "date-of-session": listSessionsDate}))
-    elif (numberAmount == 0 or numberSessions == 0 or numberDate == 0):
-        abort(400, description= "Empty query")
+        global invoiceDict
+        invoiceDict = {
+            "season": season,
+            "month": month,
+            "name": name,
+            "rate": rate,
+            "comments": comments,
+            "sessions": data
+        }
 
-    sessions = {}
-    #creating dict of sessions
-    for x in range (numberSessions):
-        sessions["session"+str(x)] = {"type": listSessions[x], "amount": listSessionsAmount[x], "date": listSessionsDate[x]}
+        path = createInvoice()
 
-    if comments == None:
-        comments = ""
+        return jsonify({"success": "true", "invoice" : path}), 201
 
-    global invoiceDict
-    invoiceDict = {
-        "season": season,
-        "month": month,
-        "name": name,
-        "rate": rate,
-        "comments": comments,
-        "sessions": sessions
-    }
-
-    return render_template('index.html', **invoiceDict)
+    except Exception as e:
+        return jsonify({"success": "false", "error": str(e)}), 500
 
 @app.errorhandler(400)
 def serverError(e):
     return render_template("400.html", error = e), 400
 
-@app.route('/createInvoice', methods=["POST"])
 def createInvoice():
-    try:
-        newInvoice = invoice.createInvoice(invoiceDict.get('season'), invoiceDict.get('month'), invoiceDict.get('name'), invoiceDict.get('rate'), invoiceDict.get('comments'), invoiceDict.get('sessions'))
-        newInvoice.openTemplate()
-        newInvoice.fillInvoice()
-        #passes invoiceDict information to invoice creation
-        newInvoiceDB = summary.summaryInvoice()
-        newInvoiceDB.createSeasonTable(invoiceDict.get('season'))
-        newInvoiceDB.insertNewInvoice(invoiceDict.get('season'), invoiceDict.get('month'), newInvoice.getInvoiceOutputPath())
-        newInvoiceDB.fillSeasonTable(invoiceDict.get('season'), invoiceDict.get('month'), invoiceDict.get('sessions'))
-        del newInvoiceDB
-        return jsonify({"success": "true", "invoice" : newInvoice.getInvoiceOutputPath()}), 201
-    except Exception as e:
-        return jsonify({"success": "false", "error": str(e)}), 500
+    newInvoice = invoice.createInvoice(invoiceDict.get('season'), invoiceDict.get('month'), invoiceDict.get('name'), invoiceDict.get('rate'), invoiceDict.get('comments'), invoiceDict.get('sessions'))
+    newInvoice.openTemplate()
+    newInvoice.fillInvoice()
+    #passes invoiceDict information to invoice creation
+    newInvoiceDB = summary.summaryInvoice()
+    newInvoiceDB.createSeasonTable(invoiceDict.get('season'))
+    newInvoiceDB.insertNewInvoice(invoiceDict.get('season'), invoiceDict.get('month'), newInvoice.getInvoiceOutputPath())
+    newInvoiceDB.fillSeasonTable(invoiceDict.get('season'), invoiceDict.get('month'), invoiceDict.get('sessions'))
+    path = newInvoice.getInvoiceOutputPath()
+    del newInvoice
+    del newInvoiceDB
+
+    return path
+
 
 @app.route("/invoice/<path:filename>", methods=["GET","POST"])
 def download(filename):
