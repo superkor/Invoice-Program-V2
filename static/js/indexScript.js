@@ -124,6 +124,7 @@ function seasonDropDown(elm){
     }
     document.getElementById(elm).classList.toggle("show")
     addSeasonTable(elm,seasonArray.indexOf(elm))
+    destroyGraph()
 }
 
 function summaryInvoice(invoiceTable){
@@ -161,10 +162,18 @@ function summaryInvoice(invoiceTable){
         newDeleteA.appendChild(newDeleteButton)
         newDiv.setAttribute("id", parms)
         newDiv.appendChild(newDeleteA)
+
+        newUpdateA = document.createElement("a")
+        newUpdateButton = document.createElement("button")
+        newUpdateA.setAttribute("style", "float: left; display: inline-block; vertical-align:center; padding: 1rem 1rem;")
+        newUpdateButton.innderHTML = "Update Invoice"
+        newUpdateButton.setAttribute("onclick", "updateExistingInvoice('"+parms+"')")
+        newDiv.appendChild(newUpdateA)
+        newUpdateA.appendChild(newUpdateButton)
     }
 }
 
-function deleteInvoice(parms, elm){
+function deleteInvoice(parms){
     season = parms.split(" ")[0]
     month = parms.split(" ")[1]
     sendParm = season + " " + month
@@ -863,14 +872,23 @@ function addSessionImport(dayNum){
             dropDown.setAttribute("selected","")
             dropDown.setAttribute("disabled","")
             dropDown.setAttribute("hidden","")
+            dropDown.innerHTML = value.value
+            dropDownSelect.appendChild(dropDown)
         } else {
-            dropDown.setAttribute("value", key)
-            if (key == "IN" || key == "NV" || key == "JR" || key == "CIR" || key == "RPT" || key == "FZ"){
-                dropDown.setAttribute("class", key)
+            if (season == "2022-2023"){
+                if (key != "IN"){
+                    dropDown.setAttribute("value", key)
+                    dropDown.innerHTML = value.value
+                    dropDownSelect.appendChild(dropDown)
+                }
+            } else {
+                if (key != "NV" && key != "JR" && key != "CIR" && key != "RPT" && key != "FZ"){
+                    dropDown.setAttribute("value", key)
+                    dropDown.innerHTML = value.value
+                    dropDownSelect.appendChild(dropDown)
+                }
             }
         }
-        dropDown.innerHTML = value.value
-        dropDownSelect.appendChild(dropDown)
  
     }
 
@@ -1273,18 +1291,27 @@ function newSession(month, year){
 function updateImport(month, year, name, rate){
     data = {}
 
+    date = document.getElementsByClassName("import-date-of-session")
+    dateArrayLength = date.length
+    dateArrayIndex = 0
+
     for (i = 0; i < lastImportDay; i++){
         sessionsList = {}
-        date = document.getElementsByClassName("import-date-of-session")[i].value
-        sessions = document.getElementsByClassName("importday"+i)
-        sessionSelect = document.getElementsByClassName("import-session-type"+i)
-        sessionAmount = document.getElementsByClassName("import-session-amount"+i)
-        for (x = 0; x < sessions.length; x ++){
-            console.log(x)
-            text = "session"+x
-            sessionsList[text] = {"type": sessionSelect[x].value, "amount": sessionAmount[x].value}
+        if (document.getElementsByClassName('importday'+i).length != 0 && document.getElementsByClassName("import-session-type"+i) != 0 && document.getElementsByClassName("import-session-amount"+i) != 0){
+            console.log(i)
+            sessions = document.getElementsByClassName("importday"+i)
+            sessionSelect = document.getElementsByClassName("import-session-type"+i)
+            sessionAmount = document.getElementsByClassName("import-session-amount"+i)
+            dateOutput = date[dateArrayIndex].value
+            console.log(sessionSelect)
+            console.log(sessionAmount)
+            for (x = 0; x < sessions.length; x ++){
+                text = "session"+x
+                sessionsList[text] = {"type": sessionSelect[x].value, "amount": sessionAmount[x].value}
+            }
+            data[dateOutput] = sessionsList
+            dateArrayIndex++
         }
-        data[date] = sessionsList
     }
 
     season = getSeason(year, month)
