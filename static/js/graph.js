@@ -147,7 +147,7 @@ function graph(elm){
                         pointRadius: 10,
                         pointHoverRadius: 15
                     }, {
-                        label: "INTER",
+                        label: "IN",
                         data: inter,
                         backgroundColor: COLORS[4],
                         pointStyle: 'circle',
