@@ -166,7 +166,7 @@ function summaryInvoice(invoiceTable){
         newUpdateA = document.createElement("a")
         newUpdateButton = document.createElement("button")
         newUpdateA.setAttribute("style", "float: left; display: inline-block; vertical-align:center; padding: 1rem 1rem;")
-        newUpdateButton.innderHTML = "Update Invoice"
+        newUpdateButton.innerHTML = "Update Invoice"
         newUpdateButton.setAttribute("onclick", "updateExistingInvoice('"+parms+"')")
         newDiv.appendChild(newUpdateA)
         newUpdateA.appendChild(newUpdateButton)
