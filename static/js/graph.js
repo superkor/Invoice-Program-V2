@@ -1,3 +1,5 @@
+var graphs = 0
+
 const CHART_COLORS = {
     red: 'rgb(255, 99, 132)',
     orange: 'rgb(255, 159, 64)',
@@ -71,55 +73,91 @@ function graph(elm){
                         label: "PCS",
                         data: pcs,
                         backgroundColor: CHART_COLORS.red,
+                        pointStyle: 'circle',
+                        pointRadius: 10,
+                        pointHoverRadius: 15
                     },{
                         label: "CS",
                         data: cs,
                         backgroundColor: CHART_COLORS.blue,
+                        pointStyle: 'circle',
+                        pointRadius: 10,
+                        pointHoverRadius: 15
                     }, {
                         label: "FZ",
                         data: fz,
                         backgroundColor: CHART_COLORS.green,
+                        pointStyle: 'circle',
+                        pointRadius: 10,
+                        pointHoverRadius: 15
                     }, {
                         label: "PEP",
                         data: pep,
                         backgroundColor: CHART_COLORS.yellow,
+                        pointStyle: 'circle',
+                        pointRadius: 10,
+                        pointHoverRadius: 15
                     }, {
                         label: "AD",
                         data: ad,
                         backgroundColor: CHART_COLORS.orange,
+                        pointStyle: 'circle',
+                        pointRadius: 10,
+                        pointHoverRadius: 15
                     }, {
                         label: "PW",
                         data: pw,
                         backgroundColor: CHART_COLORS.purple,
+                        pointStyle: 'circle',
+                        pointRadius: 10,
+                        pointHoverRadius: 15
                     }, {
                         label: "ST",
                         data: st,
                         backgroundColor: CHART_COLORS.grey,
+                        pointStyle: 'circle',
+                        pointRadius: 10,
+                        pointHoverRadius: 15
                     }, {
                         label: "NV",
                         data: nv,
                         backgroundColor: COLORS[0],
+                        pointStyle: 'circle',
+                        pointRadius: 10,
+                        pointHoverRadius: 15
                     }, {
                         label: "JR",
                         data: jr,
                         backgroundColor: COLORS[1],
+                        pointStyle: 'circle',
+                        pointRadius: 10,
+                        pointHoverRadius: 15
                     }, {
                         label: "CIR",
                         data: cir,
                         backgroundColor: COLORS[2],
+                        pointStyle: 'circle',
+                        pointRadius: 10,
+                        pointHoverRadius: 15
                     }, {
                         label: "RPT",
                         data: rpt,
                         backgroundColor: COLORS[3],
+                        pointStyle: 'circle',
+                        pointRadius: 10,
+                        pointHoverRadius: 15
                     }, {
                         label: "INTER",
                         data: inter,
                         backgroundColor: COLORS[4],
+                        pointStyle: 'circle',
+                        pointRadius: 10,
+                        pointHoverRadius: 15
                     }, 
                     ]
                 }
                 const config = {
-                    type: 'bar',
+                    type: 'line',
                     data: data,
                     options: {
                         plugins: {
@@ -130,20 +168,26 @@ function graph(elm){
                         },
                         responsive: true,
                         scales: {
-                          x: {
+                          /* x: {
                             stacked: true,
                           },
                           y: {
                             stacked: true
-                          }
+                          } */
                         }
                       }
                     }
-                new Chart(graphCanvas, config)
+                graphs = new Chart(graphCanvas, config)
             }
         },
         error: function(error){
             alert("server error "+ error.status + ": " + error.responseJSON.error)
         }
     }).done()
+}
+
+function destroyGraph(){
+    if (graphs != 0){
+        graphs.destroy()
+    }
 }
