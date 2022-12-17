@@ -62,32 +62,33 @@ class createInvoice:
     def setValues(self):
         
         for y in range(self.numberDays):
-            numberSessions = len(self.sessions[list(self.sessions)[y]])
+            numberSessions = len(self.sessions[list(self.sessions)[y]]["sessions"])
+            currDay = self.sessions[self.days[y]]["sessions"]
             for x in range(numberSessions):
-                if self.sessions[self.days[y]][f"session{x}"]["type"] == "PCS":
-                    self.pcs+=int(self.sessions[self.days[y]][f"session{x}"]["amount"])
-                elif self.sessions[self.days[y]][f"session{x}"]["type"] == "CS":
-                    self.cs+=int(self.sessions[self.days[y]][f"session{x}"]["amount"])
-                elif self.sessions[self.days[y]][f"session{x}"]["type"] == "FZ":
-                    self.fz+=int(self.sessions[self.days[y]][f"session{x}"]["amount"])
-                elif self.sessions[self.days[y]][f"session{x}"]["type"] == "NV":
-                    self.nv+=int(self.sessions[self.days[y]][f"session{x}"]["amount"])
-                elif self.sessions[self.days[y]][f"session{x}"]["type"] == "JR":
-                    self.jr+=int(self.sessions[self.days[y]][f"session{x}"]["amount"])
-                elif self.sessions[self.days[y]][f"session{x}"]["type"] == "PEP":
-                    self.pep+=int(self.sessions[self.days[y]][f"session{x}"]["amount"])
-                elif self.sessions[self.days[y]][f"session{x}"]["type"] == "AD":
-                    self.ad+=int(self.sessions[self.days[y]][f"session{x}"]["amount"])
-                elif self.sessions[self.days[y]][f"session{x}"]["type"] == "PW":
-                    self.pw+=int(self.sessions[self.days[y]][f"session{x}"]["amount"])
-                elif self.sessions[self.days[y]][f"session{x}"]["type"] == "ST":
-                    self.st+=int(self.sessions[self.days[y]][f"session{x}"]["amount"])
-                elif self.sessions[self.days[y]][f"session{x}"]["type"] == "CIR":
-                    self.cir+=int(self.sessions[self.days[y]][f"session{x}"]["amount"])
-                elif self.sessions[self.days[y]][f"session{x}"]["type"] == "RPT":
-                    self.rpt+=int(self.sessions[self.days[y]][f"session{x}"]["amount"])
-                elif self.sessions[self.days[y]][f"session{x}"]["type"] == "IN":
-                    self.inter+=int(self.sessions[self.days[y]][f"session{x}"]["amount"])
+                if currDay[f"session{x}"]["type"] == "PCS":
+                    self.pcs+=int(currDay[f"session{x}"]["amount"])
+                elif currDay[f"session{x}"]["type"] == "CS":
+                    self.cs+=int(currDay[f"session{x}"]["amount"])
+                elif currDay[f"session{x}"]["type"] == "FZ":
+                    self.fz+=int(currDay[f"session{x}"]["amount"])
+                elif currDay[f"session{x}"]["type"] == "NV":
+                    self.nv+=int(currDay[f"session{x}"]["amount"])
+                elif currDay[f"session{x}"]["type"] == "JR":
+                    self.jr+=int(currDay[f"session{x}"]["amount"])
+                elif currDay[f"session{x}"]["type"] == "PEP":
+                    self.pep+=int(currDay[f"session{x}"]["amount"])
+                elif currDay[f"session{x}"]["type"] == "AD":
+                    self.ad+=int(currDay[f"session{x}"]["amount"])
+                elif currDay[f"session{x}"]["type"] == "PW":
+                    self.pw+=int(currDay[f"session{x}"]["amount"])
+                elif currDay[f"session{x}"]["type"] == "ST":
+                    self.st+=int(currDay[f"session{x}"]["amount"])
+                elif currDay[f"session{x}"]["type"] == "CIR":
+                    self.cir+=int(currDay[f"session{x}"]["amount"])
+                elif currDay[f"session{x}"]["type"] == "RPT":
+                    self.rpt+=int(currDay[f"session{x}"]["amount"])
+                elif currDay[f"session{x}"]["type"] == "IN":
+                    self.inter+=int(currDay[f"session{x}"]["amount"])
     
     """
     Fills in the information on the Timesheet spreadsheet
@@ -210,7 +211,11 @@ class createInvoice:
                 #check if there are any sessions done on that day
                 if (sessionDict):
                     for y in sessionDict:
-                        sessionText += f"{y} - {sessionDict[y]}\n"
+                        if y != "Covering":
+                            sessionText += f"{y} - {sessionDict[y]}\n"
+                        else:
+                            if sessionDict[y] != "":
+                                sessionText += f"{y} - {sessionDict[y]}\n"
                         #write in cell below day number
                     wb[col[colIndex]+str(int(row[rowIndex])+1)] = sessionText
                 else:
@@ -323,11 +328,14 @@ class createInvoice:
         getDayDict = {}
         
         if f"{self.year}-{month}-{day}" in self.sessions:
-            getDayDict = self.sessions[f"{self.year}-{month}-{day}"]
+            getDayDict = self.sessions[f"{self.year}-{month}-{day}"]["sessions"]
             for x in getDayDict:
                 #check if session is already in exportDict
                 if getDayDict[x]['type'] in exportDict:
                     exportDict[getDayDict[x]['type']] += getDayDict[x]['amount']
                 else:
                     exportDict.update({getDayDict[x]['type']:getDayDict[x]['amount']})
+            
+            #add name of cover being covered (will return set value "" to cover key if not covering anyone)
+            exportDict['Covering'] = self.sessions[f"{self.year}-{month}-{day}"]["cover"]
         return(exportDict)

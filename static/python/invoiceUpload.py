@@ -126,15 +126,17 @@ class invoiceUpload(createInvoice):
 
         #get first day session info
         if not wb[col[colIndex]+str(int(row[0])+1)].value == None:
-            sessionDict.update({f"{self.year}-{month}-01":{}})
+            sessionDict.update({f"{self.year}-{month}-01":{"sessions": {}, "cover": ""}})
             #LOL
-            if str(wb[col[colIndex]+str(int(row[0])+1)].value).count("\n") == 0:
-                sessionDict[f"{self.year}-{month}-01"].update({"session0":{}})
-                sessionDict[f"{self.year}-{month}-01"][f"session0"].update({"type": str(wb[col[colIndex]+str(int(row[0])+1)].value).split("\n")[x].split(" - ")[0], "amount": str(wb[col[colIndex]+str(int(row[0])+1)].value).split("\n")[x].split(" - ")[1].replace("\n",'')})
-            else:
-                for x in range(str(wb[col[colIndex]+str(int(row[0])+1)].value).count("\n")):
-                    sessionDict[f"{self.year}-{month}-01"].update({f"session{x}":{}})
-                    sessionDict[f"{self.year}-{month}-01"][f"session{x}"].update({"type": str(wb[col[colIndex]+str(int(row[0])+1)].value).split("\n")[x].split(" - ")[0], "amount": str(wb[col[colIndex]+str(int(row[0])+1)].value).split("\n")[x].split(" - ")[1].replace("\n",'')})
+            numSession = 0
+            for w in wb[col[colIndex]+str(int(row[0])+1)].value.splitlines():
+                if "Covering" in w:
+                    sessionDict[f"{self.year}-{month}-01"]["cover"] = w.replace("\n", '').replace("Covering - ", "")
+                else:
+                    sessionDict[f"{self.year}-{month}-01"]["sessions"].update({f"session{numSession}":{}})
+                    sessionDict[f"{self.year}-{month}-01"]["sessions"][f"session{numSession}"].update({"type": w.split(" - ")[0].replace("\n",''), "amount": w.split(" - ")[1].replace("\n",'')})
+                    numSession+=1
+
         #if first day is not on a saturday, set next day to be next element in list. otherwise, go back to the first element
         if (colIndex != 6):
             colIndex +=1
@@ -154,16 +156,20 @@ class invoiceUpload(createInvoice):
                             #get the sessions for the day before the overflow (values before the '' part of the splitstring)
                             sessionsOverFlowDay = wb[col[colIndex]+str(int(row[rowIndex])+1)].value.splitlines()
                             day = f"{self.year}-{month}-{str(wb[col[colIndex]+row[rowIndex]].value.split('/')[0])}"
-                            sessionDict.update({day:{}})
+                            sessionDict.update({day:{"sessions": {}, "cover": ""}})
                             numSessionsInDay = 0
                             for w in sessionsOverFlowDay:
                                 if w == "":
                                     #after the '' part of the splitstring are sessions for the day (after the overflow)
                                     break
                                 elif w != "":
-                                    sessionDict[day].update({f"session{numSessionsInDay}":{}})
-                                    sessionDict[day][f"session{numSessionsInDay}"].update({"type": w.split(" - ")[0].replace("\n",''), "amount": w.split(" - ")[1].replace("\n",'')})
-                                    numSessionsInDay+=1
+                                    #check if there's coverage
+                                    if ("Covering" in w):
+                                        sessionDict[day]["cover"] = w.replace("\n", '').replace("Covering - ", "")
+                                    else:
+                                        sessionDict[day]["sessions"].update({f"session{numSessionsInDay}":{}})
+                                        sessionDict[day]["sessions"][f"session{numSessionsInDay}"].update({"type": w.split(" - ")[0].replace("\n",''), "amount": w.split(" - ")[1].replace("\n",'')})
+                                        numSessionsInDay+=1
                     else:
                         #set key name to the date and value to the sessions on that day
                         if len(str(wb[col[colIndex]+row[rowIndex]].value)) == 1:
@@ -171,15 +177,18 @@ class invoiceUpload(createInvoice):
                         else:
                             day = str(wb[col[colIndex]+row[rowIndex]].value)
 
-                        sessionDict.update({f"{self.year}-{month}-{day}":{}})
+                        sessionDict.update({f"{self.year}-{month}-{day}":{"sessions": {}, "cover": ""}})
 
                         sessionsInDay = wb[col[colIndex]+str(int(row[rowIndex])+1)].value.splitlines()
 
                         numSessionsInDay = 0
                         for w in sessionsInDay:
-                            sessionDict[f"{self.year}-{month}-{day}"].update({f"session{numSessionsInDay}":{}})
-                            sessionDict[f"{self.year}-{month}-{day}"][f"session{numSessionsInDay}"].update({"type": w.split(" - ")[0].replace("\n",''), "amount": w.split(" - ")[1].replace("\n",'')})
-                            numSessionsInDay+=1
+                            if ("Covering" in w):
+                                sessionDict[f"{self.year}-{month}-{day}"]["cover"] = w.replace("\n", '').replace("Covering - ","")
+                            else:
+                                sessionDict[f"{self.year}-{month}-{day}"]["sessions"].update({f"session{numSessionsInDay}":{}})
+                                sessionDict[f"{self.year}-{month}-{day}"]["sessions"][f"session{numSessionsInDay}"].update({"type": w.split(" - ")[0].replace("\n",''), "amount": w.split(" - ")[1].replace("\n",'')})
+                                numSessionsInDay+=1
 
             #if overflow
             if rowIndex > 4:
@@ -193,12 +202,15 @@ class invoiceUpload(createInvoice):
                         atSessionsOverFlowText = False
                         y=0
                         day = f"{self.year}-{month}-{str(wb[col[colIndex]+row[rowIndex-1]].value.split('/')[1])}"
-                        sessionDict.update({day:{}})
+                        sessionDict.update({day:{"sessions": {}, "cover": ""}})
                         for w in sessionsOverFlowDay:
                             if atSessionsOverFlowText:
-                                sessionDict[f"{self.year}-{month}-{str(wb[col[colIndex]+row[rowIndex-1]].value.split('/')[1])}"].update({f"session{y}":{}})
-                                sessionDict[f"{self.year}-{month}-{str(wb[col[colIndex]+row[rowIndex-1]].value.split('/')[1])}"][f"session{y}"].update({"type": w.split(" - ")[0].replace("\n",''), "amount": w.split(" - ")[1].replace("\n",'')})
-                                y+=1
+                                if ("Covering" in w):
+                                        sessionDict[day]["cover"] = w.replace("\n", '').replace("Covering - ", "")
+                                else:
+                                    sessionDict[day]["sessions"].update({f"session{y}":{}})
+                                    sessionDict[day]["sessions"][f"session{y}"].update({"type": w.split(" - ")[0].replace("\n",''), "amount": w.split(" - ")[1].replace("\n",'')})
+                                    y+=1
 
                             elif w == "":
                                 atSessionsOverFlowText = True

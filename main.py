@@ -19,9 +19,10 @@ TODO
 ✅ Allowed deletion of existing invoice
 ✅ Added option to view existing invoices
 ✅ Added table of sessions done per season based on existing invoices
-- Add option to sessions that user covered someone
+✅ Add option to sessions that user covered someone
 - Change amount of sessions on calendar to amount of minutes
 - Add update/edit function for an existing invoice
+- Fix Comments
 ⌛ Add some data analysis in summary (added graph; will add more analysis)
 """
 
@@ -31,33 +32,33 @@ def home():
 
 @app.route("/create", methods=["POST"])
 def create():
-    try:
-        season = request.headers['season']
-        month = request.headers['month']
-        name=request.headers["name"]
-        rate=request.headers["rate"]
-        comments = request.headers["comments"]
-        data = json.loads(request.data, strict=False)
+    """ try: """
+    season = request.headers['season']
+    month = request.headers['month']
+    name=request.headers["name"]
+    rate=request.headers["rate"]
+    comments = request.headers["comments"]
+    data = json.loads(request.data, strict=False)
 
-        if comments == None:
-            comments = ""
+    if comments == None:
+        comments = ""
 
-        global invoiceDict
-        invoiceDict = {
-            "season": season,
-            "month": month,
-            "name": name,
-            "rate": rate,
-            "comments": comments,
-            "sessions": data
-        }
+    global invoiceDict
+    invoiceDict = {
+        "season": season,
+        "month": month,
+        "name": name,
+        "rate": rate,
+        "comments": comments,
+        "sessions": data
+    }
 
-        path = createInvoice()
+    path = createInvoice()
 
-        return jsonify({"success": "true", "invoice" : path}), 201
+    return jsonify({"success": "true", "invoice" : path}), 201
 
-    except Exception as e:
-        return jsonify({"success": "false", "error": str(e)}), 500
+"""     except Exception as e:
+        return jsonify({"success": "false", "error": str(e)}), 500 """
 
 @app.errorhandler(400)
 def serverError(e):
@@ -135,6 +136,7 @@ def importInvoice():
     uploadInfo = uploadInvoice.getUploadedInvoiceInfo()
     uploadCalendar = uploadInvoice.getCalendar()
     uploadInvoice.updateDatabase()
+    print(uploadCalendar)
     return jsonify({"success": "true", "season": season, "uploadInfo": uploadInfo, "uploadCalendar": uploadCalendar}), 200
     """ except Exception as e:
         return jsonify({"success": "false", "error": str(e)}), 500 """
