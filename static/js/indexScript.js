@@ -136,39 +136,40 @@ function summaryInvoice(invoiceTable){
     for (x in invoiceTable){
         w = seasonArray.indexOf(invoiceTable[x][0])
         newDiv = document.createElement("div")
-        newDiv.setAttribute("style", "text-align: left; padding: 2rem 2rem;")
+        infoWrapperDiv = document.createElement('div')
+        newDiv.appendChild(infoWrapperDiv)
         div[w].appendChild(newDiv)
         newRow = document.createElement("a")
         newRow.setAttribute("class", "invoiceRow")
-        newRow.setAttribute("style", "float: left; display: inline-block; vertical-align:center; padding: 1rem 1rem;")
 
         newDeleteA = document.createElement("a")
         newDeleteButton = document.createElement("button")
-        newDeleteA.setAttribute("style", "float: left; display: inline-block; vertical-align:center; padding: 1rem 1rem;")
         newDeleteButton.innerHTML = "Delete Invoice"
         var parms = ""
 
 
         for (y in invoiceTable[x]){
-            if (y != 2){
-                newRow.innerHTML += " " + invoiceTable[x][y]
+            if (y == 0){
+                newRow.innerHTML += " Click Here to Access " + invoiceTable[x][y] + " "
                 parms += invoiceTable[x][y] + " "
-            } else {
+            } else if (y == 1){
+                newRow.innerHTML += invoiceTable[x][y] + " Invoice"
+                parms += invoiceTable[x][y] + " "
+            }else {
                 newRow.setAttribute("href", invoiceTable[x][y])
             }
         }
         newDeleteA.setAttribute("onclick", "deleteInvoice('"+parms+"')")
-        newDiv.appendChild(newRow)
+        infoWrapperDiv.appendChild(newRow)
         newDeleteA.appendChild(newDeleteButton)
-        newDiv.setAttribute("id", parms)
-        newDiv.appendChild(newDeleteA)
+        infoWrapperDiv.setAttribute("id", parms)
+        infoWrapperDiv.appendChild(newDeleteA)
 
         newUpdateA = document.createElement("a")
         newUpdateButton = document.createElement("button")
-        newUpdateA.setAttribute("style", "float: left; display: inline-block; vertical-align:center; padding: 1rem 1rem;")
         newUpdateButton.innerHTML = "Update Invoice"
         newUpdateButton.setAttribute("onclick", "updateExistingInvoice('"+parms+"')")
-        newDiv.appendChild(newUpdateA)
+        infoWrapperDiv.appendChild(newUpdateA)
         newUpdateA.appendChild(newUpdateButton)
     }
 }
@@ -939,8 +940,29 @@ function addDay(){
     addInput.setAttribute('value', 'Add Session')
     addInput.setAttribute('onclick', 'addSession("'+sessionDay+'")')
 
+    //Create Coverage Inputs
+    let coverageSpan = document.createElement('span')
+    coverageLabel = document.createElement('label')
+    coverageLabel.innerHTML = "Covering?"
+    coverageLabel.setAttribute("for", "cover")
+    coverageCheck = document.createElement('input')
+    coverageCheck.setAttribute("type", "checkbox")
+    coverageCheck.setAttribute('name', "cover")
+    coverageCheck.setAttribute('id', "checkbox"+sessionDay)
+    coverageCheck.setAttribute("onclick", "checkCover('"+sessionDay+"')")
+    coverageInput = document.createElement("input")
+    coverageInput.setAttribute("type", "text")
+    coverageInput.setAttribute('name', "name-of-cover")
+    coverageInput.setAttribute('id', "covername"+sessionDay)
+    coverageInput.setAttribute('placeholder', "Name of Coach")
+    coverageInput.setAttribute('hidden', '')
+    coverageSpan.appendChild(coverageLabel)
+    coverageSpan.appendChild(coverageCheck)
+    coverageSpan.appendChild(coverageInput)
+
     addSpan.appendChild(addInput)
     newDayDiv.appendChild(addSpan)
+    newDayDiv.appendChild(coverageSpan)
 
     //create entry for new session under the day
     let newSession = document.createElement("div")
@@ -1001,7 +1023,13 @@ function submitForm(){
             text = "session"+x
             sessionsList[text] = {"type": sessionSelect[x].value, "amount": sessionAmount[x].value}
         }
-        data[date] = sessionsList
+
+        if (document.getElementById("checkbox"+i).checked){
+            coverName = document.getElementById("covername"+i).value
+        } else {
+            coverName = ""
+        }
+        data[date] = {"sessions": sessionsList, "cover": coverName}
     }
 
     var request = $.ajax({
@@ -1068,6 +1096,7 @@ function uploadInvoice(){
             divContainer.setAttribute('id', "importContainer")
             calDiv.appendChild(divContainer)
 
+            console.log(response["uploadCalendar"])
             //go through uploadCalendar dict from server
             for (const [date, sessions] of Object.entries(response["uploadCalendar"])){
                 newCalRow = document.createElement("div")
@@ -1109,62 +1138,95 @@ function uploadInvoice(){
                 divContainer.appendChild(newCalRow)
 
                 for (const [x,session] of Object.entries(sessions)){
-                    infoDiv = document.createElement("div")
-                    infoDiv.setAttribute("class", "importday"+i)
-                    newCalRow.appendChild(infoDiv)
-                    newSpan = document.createElement("span")
-                    infoDiv.appendChild(newSpan)
-                    newDropDown = document.createElement("select")
-                    newSpan.appendChild(newDropDown)
-                    newDropDown.setAttribute("name", "import-session-type")
-                    newDropDown.setAttribute("class", "import-session-type"+i)
-                    newDropDown.setAttribute("required","")
-                    //go through options dict for drop down. display default option if that's the session for that day. exclude options based on season
-                    for (const [sessionValue, sessionName] of Object.entries(options)){
-                        if (sessionValue != "default"){
-                            if (season == "2022-2023"){
-                                if (sessionValue != "IN"){
-                                    dropDown = document.createElement("option")
-                                    dropDown.setAttribute("value", sessionValue)
-                                    dropDown.innerHTML = sessionName.value
-                                    newDropDown.appendChild(dropDown)
-                                }
-                            } else {
-                                if (sessionValue != "NV" && sessionValue != "JR" && sessionValue != "CIR" && sessionValue != "RPT" && sessionValue != "FZ"){
-                                    dropDown = document.createElement("option")
-                                    dropDown.setAttribute("value", sessionValue)
-                                    dropDown.innerHTML = sessionName.value
-                                    newDropDown.appendChild(dropDown)
-                                }
-                            }
-                            if (sessionValue == session["type"]){
-                                dropDown.setAttribute("selected","")
-                            }
+                    if (x == "cover"){
+                        //add covering
+
+                        coverSpan = document.createElement("span")
+                        newCalRow.appendChild(coverSpan)
+                        coverLabel = document.createElement("label")
+                        coverLabel.setAttribute("for", "cover")
+                        coverLabel.innerHTML = "Covering?"
+                        coverCheckBox = document.createElement("input")
+                        coverCheckBox.setAttribute("type", "checkbox")
+                        coverCheckBox.setAttribute("name", "cover")
+                        coverCheckBox.setAttribute("id", "importcheckbox"+i)
+                        coverCheckBox.setAttribute("onclick", "checkCover('"+i+"', true)")
+                        coverInput = document.createElement("input")
+                        coverInput.setAttribute("type", "text")
+                        coverInput.setAttribute("name", "name-of-cover")
+                        coverInput.setAttribute("id", "importcovername"+i)
+                        coverInput.setAttribute("placeholder", "Name of Coach")
+
+                        if (session != ""){
+                            coverCheckBox.checked = true
+                            coverInput.value = session
+                            coverInput.setAttribute("required", "")
+                        } else {
+                            coverInput.setAttribute("hidden", "")
+                            coverInput.value = ""
                         }
+                        coverSpan.appendChild(coverLabel)
+                        coverSpan.appendChild(coverCheckBox)
+                        coverSpan.appendChild(coverInput)
                     }
-
-                    //get amount of session on that day and set that as default value
-                    newSpanSessionAmount = document.createElement("span")
-                    infoDiv.appendChild(newSpanSessionAmount)
-                    numInput = document.createElement("input")
-                    newSpanSessionAmount.appendChild(numInput)
-                    numInput.setAttribute("name","import-session-amount")
-                    numInput.setAttribute("class","import-session-amount"+i)
-                    numInput.setAttribute("type","number")
-                    numInput.setAttribute("placeholder","Number of Sessions")
-                    numInput.setAttribute("required","")
-                    numInput.setAttribute("value",session["amount"])
-                    
-                    deleteButton = document.createElement("input")
-                    deleteButton.setAttribute("type", "button")
-                    deleteButton.setAttribute("id","deleteSession")
-                    deleteButton.setAttribute("value","Delete Session")
-                    deleteButton.addEventListener("click",deleteSession)
-                    infoDiv.appendChild(deleteButton)
-
+                    if (x == "sessions"){
+                        infoDiv = document.createElement("div")
+                        infoDiv.setAttribute("class", "importday"+i)
+                        newCalRow.appendChild(infoDiv)
+                        newSpan = document.createElement("span")
+                        infoDiv.appendChild(newSpan)
+                        newDropDown = document.createElement("select")
+                        newSpan.appendChild(newDropDown)
+                        newDropDown.setAttribute("name", "import-session-type")
+                        newDropDown.setAttribute("class", "import-session-type"+i)
+                        newDropDown.setAttribute("required","")
+                        for (const [sessionNum, sessionDict] of Object.entries(session)){
+                            //go through options dict for drop down. display default option if that's the session for that day. exclude options based on season
+                            for (const [sessionValue, sessionName] of Object.entries(options)){
+                                if (sessionValue != "default"){
+                                    if (season == "2022-2023"){
+                                        if (sessionValue != "IN"){
+                                            dropDown = document.createElement("option")
+                                            dropDown.setAttribute("value", sessionValue)
+                                            dropDown.innerHTML = sessionName.value
+                                            newDropDown.appendChild(dropDown)
+                                        }
+                                    } else {
+                                        if (sessionValue != "NV" && sessionValue != "JR" && sessionValue != "CIR" && sessionValue != "RPT" && sessionValue != "FZ"){
+                                            dropDown = document.createElement("option")
+                                            dropDown.setAttribute("value", sessionValue)
+                                            dropDown.innerHTML = sessionName.value
+                                            newDropDown.appendChild(dropDown)
+                                        }
+                                    }
+                                    if (sessionValue == session[sessionNum]["type"]){
+                                        dropDown.setAttribute("selected","")
+                                    }
+                                }
+                            }
+                            //get amount of session on that day and set that as default value
+                            newSpanSessionAmount = document.createElement("span")
+                            infoDiv.appendChild(newSpanSessionAmount)
+                            numInput = document.createElement("input")
+                            newSpanSessionAmount.appendChild(numInput)
+                            numInput.setAttribute("name","import-session-amount")
+                            numInput.setAttribute("class","import-session-amount"+i)
+                            numInput.setAttribute("type","number")
+                            numInput.setAttribute("placeholder","Number of Sessions")
+                            numInput.setAttribute("required","")
+                            numInput.setAttribute("value",session[sessionNum]["amount"])
+                            
+                            deleteButton = document.createElement("input")
+                            deleteButton.setAttribute("type", "button")
+                            deleteButton.setAttribute("id","deleteSession")
+                            deleteButton.setAttribute("value","Delete Session")
+                            deleteButton.addEventListener("click",deleteSession)
+                            infoDiv.appendChild(deleteButton)
+                        }
+                        ++i
+                        lastImportDay = i
+                    }
                 }
-                ++i
-                lastImportDay = i
             }
 
             //add button to add new sessions
@@ -1298,18 +1360,20 @@ function updateImport(month, year, name, rate){
     for (i = 0; i < lastImportDay; i++){
         sessionsList = {}
         if (document.getElementsByClassName('importday'+i).length != 0 && document.getElementsByClassName("import-session-type"+i) != 0 && document.getElementsByClassName("import-session-amount"+i) != 0){
-            console.log(i)
             sessions = document.getElementsByClassName("importday"+i)
             sessionSelect = document.getElementsByClassName("import-session-type"+i)
             sessionAmount = document.getElementsByClassName("import-session-amount"+i)
             dateOutput = date[dateArrayIndex].value
-            console.log(sessionSelect)
-            console.log(sessionAmount)
             for (x = 0; x < sessions.length; x ++){
                 text = "session"+x
                 sessionsList[text] = {"type": sessionSelect[x].value, "amount": sessionAmount[x].value}
             }
-            data[dateOutput] = sessionsList
+            if (document.getElementById('importcheckbox'+i).checked){
+                coverName = document.getElementById('importcovername'+i).value
+            } else {
+                coverName = ""
+            }
+            data[dateOutput] = {'sessions': sessionsList, 'cover': coverName}
             dateArrayIndex++
         }
     }
@@ -1335,4 +1399,28 @@ function updateImport(month, year, name, rate){
         }
     }).done()
 
+}
+
+function checkCover(elm, importInvoice=false){
+    if (!importInvoice){
+        coachInput = document.getElementById("covername"+elm)
+        if (document.getElementById("checkbox"+elm).checked){
+
+            coachInput.removeAttribute('hidden')
+            coachInput.setAttribute("required", "")
+        } else{
+            coachInput.setAttribute('hidden', "")
+            coachInput.removeAttribute("required")
+        }
+    } else {
+        coachInput = document.getElementById("importcovername"+elm)
+        if (document.getElementById("importcheckbox"+elm).checked){
+
+            coachInput.removeAttribute('hidden')
+            coachInput.setAttribute("required", "")
+        } else{
+            coachInput.setAttribute('hidden', "")
+            coachInput.removeAttribute("required")
+        }
+    }
 }
