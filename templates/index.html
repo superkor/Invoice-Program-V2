@@ -6,6 +6,9 @@
         <script src="{{ url_for('static', filename='js/graph.js')}}"></script>
         <script src="{{ url_for('static', filename='js/updateExistingInvoice.js')}}"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="{{ url_for('static', filename='js/importInvoice.js')}}"></script>
+        <script src="{{ url_for('static', filename='js/invoiceCreation.js')}}"></script>
+        <script src="{{ url_for('static', filename='js/invoiceSummary.js')}}"></script>
         <script>
             months = ["", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
             headerRow = ['Month', 'PreCanskate (PCS)', 'Canskate (CS)', 'Funzone (FZ)', 'Novice (NV)', 'Junior (JR)', 'Performance Enrichment Program (PEP)', 'Adult (AD)', 
@@ -19,7 +22,6 @@
             <h1>Invoice Program</h1>
         </header>
         <div id = "main">
-            <!-- After creating invoice, notification on successful creation will show (will provide download link to the invoice itself) -->
             <div class = "notification" style="display:none">
                 <a id="invoice"></a>
             </div>
@@ -44,7 +46,6 @@
                         </select>
                     </div>
                     <div id = "Month">
-                        <!-- Function addMonthOptions() adds options for dropdown -->
                         <label for="month">Month</label>
                         <select name = "month" id="monthDropDown" required onchange="onChange()">
                         </select>
@@ -99,7 +100,6 @@
                             </div>
                         </div>
                     </div>
-                    <!-- addSession() on button adds new div to add new sessions. each new session div will have a delete button that will delete the created session div -->
                     <div id="AddDay">
                         <input type="button" name="add-day" value = "Add Day" onclick="addDay()">
                     </div>
