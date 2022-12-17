@@ -102,6 +102,7 @@ class invoiceUpload(createInvoice):
 
     def updateDatabase(self):
         updateSummary = summary.summaryInvoice()
+        updateSummary.insertNewInvoice(self.season, self.month, self.uploadPath)
         updateSummary.createSeasonTable(self.season)
         updateSummary.fillSeasonTable(self.season, self.month, self.sessions)
         del updateSummary

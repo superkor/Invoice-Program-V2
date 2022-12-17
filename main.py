@@ -10,6 +10,7 @@ import json
 app = Flask(__name__, template_folder='templates')
 app.config['UPLOAD_FOLDER'] = "invoice/upload"
 ALLOWED_EXTENSIONS = {'xlsx'}
+monthArray = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
 
 """
@@ -21,7 +22,7 @@ TODO
 ✅ Added table of sessions done per season based on existing invoices
 ✅ Add option to sessions that user covered someone
 - Change amount of sessions on calendar to amount of minutes
-- Add update/edit function for an existing invoice
+✅ Add update/edit function for an existing invoice
 - Fix Comments
 ⌛ Add some data analysis in summary (added graph; will add more analysis)
 """
@@ -136,10 +137,29 @@ def importInvoice():
     uploadInfo = uploadInvoice.getUploadedInvoiceInfo()
     uploadCalendar = uploadInvoice.getCalendar()
     uploadInvoice.updateDatabase()
-    print(uploadCalendar)
     return jsonify({"success": "true", "season": season, "uploadInfo": uploadInfo, "uploadCalendar": uploadCalendar}), 200
     """ except Exception as e:
         return jsonify({"success": "false", "error": str(e)}), 500 """
+
+@app.route("/showExisting", methods=["POST"])
+def showExisting():
+    data = json.loads(request.data, strict=False)
+    season = data["season"]
+    month = data["month"]
+
+    monthIndex = monthArray.index(month)+1
+    if (monthIndex >= 9):
+        year = season.split('-')[0]
+    else:
+        year = season.split('-')[1]
+    
+    uploadInvoice = upload.invoiceUpload(f"{month}_{year}_Invoice.xlsx")
+    uploadInvoice.getSeason()
+    uploadInvoice.openUploadedFile()
+    uploadInfo = uploadInvoice.getUploadedInvoiceInfo()
+    uploadCalendar = uploadInvoice.getCalendar()
+    return jsonify({"success": "true", "season": season, "uploadInfo": uploadInfo, "uploadCalendar": uploadCalendar}), 200
+    pass
 
 @app.route("/updateImport", methods=["POST"])
 def updateImport():

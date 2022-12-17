@@ -60,6 +60,12 @@ class summaryInvoice:
                 """
                 self.mycursor.execute(insertInvoice, (season, month, link))
                 self.mydb.commit()
+            else:
+                overwriteInvoice = """
+                    UPDATE list_invoices SET link = %s WHERE season = %s AND months = %s
+                """
+                self.mycursor.execute(overwriteInvoice, (link, season, month))
+                self.mydb.commit()
         except mysql.connector.Error as err:
             raise err
 
