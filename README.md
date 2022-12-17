@@ -22,7 +22,7 @@ Required libraries: Flask, mysql.connector, werkzeug, openpyxl, shutil, jQuery. 
 
 Run ```python -m flask -app main run``` at the root of the project to start the flask server. 
 
-In the bin folder of the MySQL Server folder, run ```mysqld --console``` to start the sql server.
+In the bin folder of the MySQL Server folder, run ```mysqld --console``` to start the sql server (must be running cmd as admin).
 
 Open the local webpage as seen in the python console (usually 127.0.0.1:5000).
 
@@ -66,6 +66,8 @@ Upon clicking confirm and when the invoice has been created, user will be redire
 ![Confirm Example](https://github.com/superkor/Invoice-Program-V2/blob/main/images/invoicecreated.png)
 
 The created invoice (server side) is located in `invoice/output`. Invoice file name will be `{Month} {Year} Invoice.xlxx`, with the year based on the season and month selected.
+
+The Program will generate an date-session dictionary between client and server in the form of: `sessionData = {[date1]: {'sessions': {'session0': {'type': [sessionType], 'amount': [sessionAmount]}}, 'cover': [coachName]}}, [date2]: {...}, ...}`. However, the invoice dictionary (containing other information like season, month, name, etc), will be in the form of `{"season": [season], "month": [month], "name": [name], "comments": [comments], "sessions": [sessionData]}`
 
 ### Viewing the Created Invoice
 
