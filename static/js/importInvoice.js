@@ -175,17 +175,17 @@ function uploadInvoice(uploadedFile = true, season="", month=""){
                             coverSpan.appendChild(coverInput)
                         }
                         if (x == "sessions"){
-                            infoDiv = document.createElement("div")
-                            infoDiv.setAttribute("class", "importday"+i)
-                            newCalRow.appendChild(infoDiv)
-                            newSpan = document.createElement("span")
-                            infoDiv.appendChild(newSpan)
-                            newDropDown = document.createElement("select")
-                            newSpan.appendChild(newDropDown)
-                            newDropDown.setAttribute("name", "import-session-type")
-                            newDropDown.setAttribute("class", "import-session-type"+i)
-                            newDropDown.setAttribute("required","")
                             for (const [sessionNum, sessionDict] of Object.entries(session)){
+                                infoDiv = document.createElement("div")
+                                infoDiv.setAttribute("class", "importday"+i)
+                                newCalRow.appendChild(infoDiv)
+                                newSpan = document.createElement("span")
+                                infoDiv.appendChild(newSpan)
+                                newDropDown = document.createElement("select")
+                                newSpan.appendChild(newDropDown)
+                                newDropDown.setAttribute("name", "import-session-type")
+                                newDropDown.setAttribute("class", "import-session-type"+i)
+                                newDropDown.setAttribute("required","")
                                 //go through options dict for drop down. display default option if that's the session for that day. exclude options based on season
                                 for (const [sessionValue, sessionName] of Object.entries(options)){
                                     if (sessionValue != "default"){
@@ -227,9 +227,9 @@ function uploadInvoice(uploadedFile = true, season="", month=""){
                                 deleteButton.setAttribute("value","Delete Session")
                                 deleteButton.addEventListener("click",deleteSession)
                                 infoDiv.appendChild(deleteButton)
+                                ++i
+                                lastImportDay = i
                             }
-                            ++i
-                            lastImportDay = i
                         }
                     }
                 }
