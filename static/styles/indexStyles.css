@@ -108,3 +108,7 @@ body {font-family: Verdana;}
   .sessionDay {
     border: #c21fba 3px solid;
   }
+
+  .graphWrapper{
+    height:500px;
+  }

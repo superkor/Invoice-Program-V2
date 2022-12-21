@@ -167,6 +167,7 @@ function graph(elm){
                           },
                         },
                         responsive: true,
+                        maintainAspectRatio: false,
                         scales: {
                           /* x: {
                             stacked: true,
