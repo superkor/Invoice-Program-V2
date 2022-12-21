@@ -4,18 +4,6 @@ A simple Flask-based web application to automate the creation, updating (through
 
 This application uses the Flask web framework, JQuery, MySQL, and custom python APIs used to interface and interact with openpyxl (to create and update invoices) and with SQL databases.
 
-There are two SQL tables being used: `list_invoices` and tables named based on the season.
-
-list_invoices table displays all invoices created and invoices uploaded, and then updated, through the application. Each row contains their respective season and month the invoice is for and their file download link.
-
-![Sample list_invoices table](https://github.com/superkor/Invoice-Program-V2/blob/main/images/list_invoices.png)
-
-The second table type is for holding session total data, separated into their respective season.
-
-An example is the 2022-2023 table that holds all invoices created and updated through the application. Each row contains total sessions for each type of possible sessions that can be on the invoice (PCS, CS, FZ, NV, JR, PEP, AD, PW, ST, CIR, RPT, INTER). The Hours column is simply the total hours spent working in that month based on the total number of sessions worked.
-
-![Sample `'2022-2023'` table](https://github.com/superkor/Invoice-Program-V2/blob/main/images/2022-2023_table.png)
-
 ## Usage
 
 Required libraries: Flask, mysql.connector, werkzeug, openpyxl, shutil, jQuery. Also requires MySQL (using MySQL Server 8.0).
@@ -52,7 +40,7 @@ Based on the season, the dropdown will show possible sessions that can be select
 For example, doing a "Fun Zone" session twice in a day on Jan 18, 2023 should be inputed like:
 ![Session Example](https://github.com/superkor/Invoice-Program-V2/blob/main/images/sessionExample.png)
 
-Clicking on `Add Session` will add another row to add another session input.
+Clicking on `Add Session` will add another row to add another session input for the same day. Clicking on `Add Day` will add another box to add sessions done on a different day.
 
 The Date selector on each session row will be locked to the month and season you have selected. Months September to December will take the first year in the season. January to August will take the second year in the season. For example Decemeber in season 2022-2023 will be Dec 2022 but May in season 2022-2023 will be May 2023.
 
@@ -62,8 +50,6 @@ Upon clicking Submit and when the invoice has been created, user will be redirec
 ![Confirm Example](https://github.com/superkor/Invoice-Program-V2/blob/main/images/invoicecreated.png)
 
 The created invoice (server side) is located in `invoice/output`. Invoice file name will be `{Month} {Year} Invoice.xlxx`, with the year based on the season and month selected.
-
-The Program will generate an date-session dictionary between client and server in the form of: `sessionData = {<date1>: {'sessions': {'session0': {'type': <sessionType>, 'amount': <sessionAmount>}}, 'cover': <coachName>}}, <date2>: {...}, ...}`. However, the invoice dictionary (containing other information like season, month, name, etc), will be in the form of `{"season": <season>, "month": <month>, "name": <name>, "comments": <comments>, "sessions": sessionData}`
 
 ### Viewing the Created Invoice
 
@@ -82,9 +68,26 @@ In the `list_invoices` table, the created invoice will be shown:
 In the season `2022-2023` table, the total sessions done will be shown:
 ![2022-2023 table example](https://github.com/superkor/Invoice-Program-V2/blob/main/images/sampleseason.png)
 
-WIP
+### Uploading an Invoice
 
+Under the `Import Invoice` tab, a prompt allows a user to upload a valid invoice.
+![Import Invoice Page](https://github.com/superkor/Invoice-Program-V2/blob/main/images/importpage.png)
 
-- User is able to create invoices through this application to automate the tedious tasks of filling in the invoice and timesheet. Program will automatically select the correct template that is correct for the season and fill in the information given by user. All created invoices will be added to a database to be displayed to show the summary of invoices and some data analysis.
-- improves intial invoice program by adding in summary of created invoices (adding in some analytical data into it)
-- uses python (using flask framework), html/css/js, and sql to store created invoices
+Uploading an invoice will automatically get the information from the invoice and display it to the user to allow them to update the invoice. Uploading the invoice (with or without modification) will update the SQL table.
+![Sample Import Invoice Page](https://github.com/superkor/Invoice-Program-V2/blob/main/images/sampleimport.png)
+
+### Summary of Invoices
+
+Under the `Summary of Invoices` tab, user is shown season buttons to view summary of all uploaded and created invoices.
+![Summary of Invoices Page](https://github.com/superkor/Invoice-Program-V2/blob/main/images/summarypage.png)
+
+Clicking on `2022-2023` will show a table of months and their respective number of sessions, a graph showing the amonut of sessions per month, and options to downloading, deleting, and updating an invoice.
+![Summary 1](https://github.com/superkor/Invoice-Program-V2/blob/main/images/summary1.png)
+![Summary 2](https://github.com/superkor/Invoice-Program-V2/blob/main/images/summary2.png)
+
+Clicking `Update Invoice` will redirect to the Import Invoice tab with the selected invoice's information.
+![Update Example](https://github.com/superkor/Invoice-Program-V2/blob/main/images/updateinvoice.png)
+
+Clicking on `Click Here to access {Season} {Month} Invoice` will download the invoice file.
+
+Clicking on `Delete Invoice` under a specific month will delete the invoice from the server and all tables in the database.
