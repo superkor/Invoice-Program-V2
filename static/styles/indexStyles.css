@@ -112,3 +112,9 @@ body {font-family: Verdana;}
   .graphWrapper{
     height:500px;
   }
+
+  textarea{
+    resize: none;
+    height: 5em;
+    overflow: hidden;
+  }

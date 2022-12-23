@@ -144,7 +144,24 @@ class createInvoice:
                 wb["C26"] = self.st
 
         # fix comments later
-        # wb["J20"] = self.comments
+        commentArray = []
+        #42 is max characters that can be displayed at once in comment line
+        if (len(self.comments) > 42):
+            for i in range(0,len(self.comments), 42):
+                commentArray.append(self.comments[i:i+42])
+            if self.season == "2022-2023":
+                for x in range(len(commentArray)):
+                    if x <= 6:
+                        wb[f"I2{str(3+x)}"] = commentArray[x]
+            else:
+                for x in range(len(commentArray)):
+                    if x <= 4:
+                        wb[f"I2{str(x)}"] = commentArray[x]
+        else:
+            if self.season == "2022-2023":
+                wb["I23"] = self.comments
+            else:
+                wb["I20"] = self.comments
 
         newInvoice.save(filename = self.invoiceOutputPath)
         self.fillCalendar()
