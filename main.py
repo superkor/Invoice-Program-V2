@@ -6,11 +6,13 @@ from mysql.connector import errorcode
 from werkzeug.utils import secure_filename
 import os
 import json
+import static.python.exceptions as exceptions
 
 app = Flask(__name__, template_folder='templates')
 app.config['UPLOAD_FOLDER'] = "invoice/upload"
 ALLOWED_EXTENSIONS = {'xlsx'}
 monthArray = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+seasonArray = ["2019-2020", "2020-2021", "2021-2022", "2022-2023"]
 
 
 """
@@ -33,37 +35,58 @@ def home():
 
 @app.route("/create", methods=["POST"])
 def create():
-    """ try: """
-    season = request.headers['season']
-    month = request.headers['month']
-    name=request.headers["name"]
-    rate=request.headers["rate"]
-    comments = request.headers["comments"]
-    data = json.loads(request.data, strict=False)
+    try:
+        season = request.headers['season']
+        month = request.headers['month']
+        name=request.headers["name"]
+        rate=request.headers["rate"]
+        comments = request.headers["comments"]
+        data = json.loads(request.data, strict=False)
 
-    if comments == None:
-        comments = ""
+        if not season in seasonArray:
+            raise exceptions.invalidSeason
 
-    global invoiceDict
-    invoiceDict = {
-        "season": season,
-        "month": month,
-        "name": name,
-        "rate": rate,
-        "comments": comments,
-        "sessions": data
-    }
+        if not month in monthArray:
+            raise exceptions.invalidMonth
 
-    path = createInvoice()
+        if not rate.isdigit():
+            raise exceptions.invalidRate
 
-    return jsonify({"success": "true", "invoice" : path}), 201
+        if comments == None:
+            comments = ""
 
-"""     except Exception as e:
-        return jsonify({"success": "false", "error": str(e)}), 500 """
+        global invoiceDict
+        invoiceDict = {
+            "season": season,
+            "month": month,
+            "name": name,
+            "rate": rate,
+            "comments": comments,
+            "sessions": data
+        }
+
+        path = createInvoice()
+
+        return jsonify({"success": "true", "invoice" : path}), 201
+
+    except exceptions.invalidSeason:
+        return jsonify({"success": "false", "error": "Invalid Season"}), 400
+
+    except exceptions.invalidMonth:
+        return jsonify({"success": "false", "error": "Invalid Month"}), 400
+
+    except exceptions.invalidRate:
+        return jsonify({"success": "false", "error": "Rate is not integer"}), 400
+            
+    except PermissionError:
+        return jsonify({"success": "false", "error": "Permission Error"}), 500
+
+    except Exception as e:
+        return jsonify({"success": "false", "error": str(e)}), 500
 
 @app.errorhandler(400)
-def serverError(e):
-    return render_template("400.html", error = e), 400
+def badRequest(e):
+    return jsonify({"success": "false", "error": str(e)}), 400
 
 def createInvoice():
     newInvoice = invoice.createInvoice(invoiceDict.get('season'), invoiceDict.get('month'), invoiceDict.get('name'), invoiceDict.get('rate'), invoiceDict.get('comments'), invoiceDict.get('sessions'))
@@ -85,8 +108,6 @@ def createInvoice():
 def download(filename):
     path = "invoice\\"+filename
     return send_file(path, as_attachment=True)
-
-    return request.url_root
 
 @app.route("/summaryInvoice", methods=["GET"])
 def summaryInvoice():
@@ -127,73 +148,102 @@ def sortInvoice():
 
 @app.route("/importInvoice", methods=["POST"])
 def importInvoice():
-    """     try: """
-    file = request.files['inputInvoice']
-    filename = (secure_filename(file.filename))
-    file.save(os.path.join(app.config['UPLOAD_FOLDER'],filename))
-    uploadInvoice = upload.invoiceUpload(filename)
-    season = uploadInvoice.getSeason()
-    uploadInvoice.openUploadedFile()
-    uploadInfo = uploadInvoice.getUploadedInvoiceInfo()
-    uploadCalendar = uploadInvoice.getCalendar()
-    uploadInvoice.updateDatabase()
-    return jsonify({"success": "true", "season": season, "uploadInfo": uploadInfo, "uploadCalendar": uploadCalendar}), 200
-    """ except Exception as e:
-        return jsonify({"success": "false", "error": str(e)}), 500 """
+    try:
+        file = request.files['inputInvoice']
+        filename = (secure_filename(file.filename))
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'],filename))
+        uploadInvoice = upload.invoiceUpload(filename)
+        season = uploadInvoice.getSeason()
+        uploadInvoice.openUploadedFile()
+        uploadInfo = uploadInvoice.getUploadedInvoiceInfo()
+        uploadCalendar = uploadInvoice.getCalendar()
+        uploadInvoice.updateDatabase()
+        return jsonify({"success": "true", "season": season, "uploadInfo": uploadInfo, "uploadCalendar": uploadCalendar}), 200
+    except Exception as e:
+        return jsonify({"success": "false", "error": str(e)}), 500
 
 @app.route("/showExisting", methods=["POST"])
 def showExisting():
-    data = json.loads(request.data, strict=False)
-    season = data["season"]
-    month = data["month"]
+    try:
+        data = json.loads(request.data, strict=False)
+        season = data["season"]
+        month = data["month"]
 
-    monthIndex = monthArray.index(month)+1
-    if (monthIndex >= 9):
-        year = season.split('-')[0]
-    else:
-        year = season.split('-')[1]
+        monthIndex = monthArray.index(month)+1
+        if (monthIndex >= 9):
+            year = season.split('-')[0]
+        else:
+            year = season.split('-')[1]
+        
+        uploadInvoice = upload.invoiceUpload(f"{month} {year} Invoice.xlsx", False)
+        uploadInvoice.getSeason()
+        uploadInvoice.openUploadedFile()
+        uploadInfo = uploadInvoice.getUploadedInvoiceInfo()
+        uploadCalendar = uploadInvoice.getCalendar()
+        return jsonify({"success": "true", "season": season, "uploadInfo": uploadInfo, "uploadCalendar": uploadCalendar}), 200
+
+    except exceptions.invalidSeason:
+        return jsonify({"success": "false", "error": "Invalid Season"}), 400
+
+    except exceptions.invalidMonth:
+        return jsonify({"success": "false", "error": "Invalid Month"}), 400
+            
+    except PermissionError:
+        return jsonify({"success": "false", "error": "Permission Error"}), 500
+
+    except Exception as e:
+        return jsonify({"success": "false", "error": str(e)}), 500
     
-    uploadInvoice = upload.invoiceUpload(f"{month}_{year}_Invoice.xlsx")
-    uploadInvoice.getSeason()
-    uploadInvoice.openUploadedFile()
-    uploadInfo = uploadInvoice.getUploadedInvoiceInfo()
-    uploadCalendar = uploadInvoice.getCalendar()
-    return jsonify({"success": "true", "season": season, "uploadInfo": uploadInfo, "uploadCalendar": uploadCalendar}), 200
-    pass
 
 @app.route("/updateImport", methods=["POST"])
 def updateImport():
-    #Add comments later
-    #comments = request.args.get("comments")
-    data = json.loads(request.data, strict=False)
-    season = request.headers["season"]
-    month = request.headers["month"]
-    comments = request.headers["comments"]
-    name = request.headers["name"]
-    rate = request.headers["rate"]
+    try:
+        #Add comments later
+        #comments = request.args.get("comments")
+        data = json.loads(request.data, strict=False)
+        season = request.headers["season"]
+        month = request.headers["month"]
+        comments = request.headers["comments"]
+        name = request.headers["name"]
+        rate = request.headers["rate"]
 
-    if comments == None:
-        comments = ""
+        if comments == None:
+            comments = ""
 
-    updateInvoiceDict = {
-        "season": season,
-        "month": month,
-        "comments": comments,
-        "sessions": data,
-        "name": name,
-        "rate": rate
-    }
+        updateInvoiceDict = {
+            "season": season,
+            "month": month,
+            "comments": comments,
+            "sessions": data,
+            "name": name,
+            "rate": rate
+        }
 
-    newInvoice = invoice.createInvoice(updateInvoiceDict.get('season'), updateInvoiceDict.get('month'), updateInvoiceDict.get('name'), updateInvoiceDict.get('rate'), updateInvoiceDict.get('comments'), updateInvoiceDict.get('sessions'))
-    newInvoice.openTemplate()
-    newInvoice.fillInvoice()
-    #passes updateInvoiceDict information to invoice creation
-    newInvoiceDB = summary.summaryInvoice()
-    newInvoiceDB.createSeasonTable(updateInvoiceDict.get('season'))
-    newInvoiceDB.insertNewInvoice(updateInvoiceDict.get('season'), updateInvoiceDict.get('month'), newInvoice.getInvoiceOutputPath())
-    newInvoiceDB.fillSeasonTable(updateInvoiceDict.get('season'), updateInvoiceDict.get('month'), updateInvoiceDict.get('sessions'))
-    del newInvoiceDB
-    return jsonify({"success": "true", "invoice" : newInvoice.getInvoiceOutputPath()}), 201
+        newInvoice = invoice.createInvoice(updateInvoiceDict.get('season'), updateInvoiceDict.get('month'), updateInvoiceDict.get('name'), updateInvoiceDict.get('rate'), updateInvoiceDict.get('comments'), updateInvoiceDict.get('sessions'))
+        newInvoice.openTemplate()
+        newInvoice.fillInvoice()
+        #passes updateInvoiceDict information to invoice creation
+        newInvoiceDB = summary.summaryInvoice()
+        newInvoiceDB.createSeasonTable(updateInvoiceDict.get('season'))
+        newInvoiceDB.insertNewInvoice(updateInvoiceDict.get('season'), updateInvoiceDict.get('month'), newInvoice.getInvoiceOutputPath())
+        newInvoiceDB.fillSeasonTable(updateInvoiceDict.get('season'), updateInvoiceDict.get('month'), updateInvoiceDict.get('sessions'))
+        del newInvoiceDB
+        return jsonify({"success": "true", "invoice" : newInvoice.getInvoiceOutputPath()}), 201
+
+    except exceptions.invalidSeason:
+        return jsonify({"success": "false", "error": "Invalid Season"}), 400
+
+    except exceptions.invalidMonth:
+        return jsonify({"success": "false", "error": "Invalid Month"}), 400
+
+    except exceptions.invalidRate:
+        return jsonify({"success": "false", "error": "Rate is not integer"}), 400
+            
+    except PermissionError:
+        return jsonify({"success": "false", "error": "Permission Error"}), 500
+
+    except Exception as e:
+        return jsonify({"success": "false", "error": str(e)}), 500
 
 @app.route("/deleteInvoice", methods=["POST"])
 def deleteInvoice():

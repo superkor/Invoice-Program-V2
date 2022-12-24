@@ -1,4 +1,6 @@
-function addSessionImport(dayNum){
+var lastImportDay = 0
+
+function addSessionImport(dayNum, season){
     let mainDiv = document.getElementById("importday"+dayNum)
     let newSession = document.createElement("div")
     let dropDownSpan = document.createElement("span")
@@ -119,6 +121,9 @@ function uploadInvoice(uploadedFile = true, season="", month=""){
                     dateYear = response["uploadInfo"]["year"]
 
                     dateMonth = months.indexOf(response["uploadInfo"]["month"]).toString()
+                    if (dateMonth.length == 1){
+                        dateMonth = "0"+dateMonth
+                    }
                     dateInput.setAttribute("value", date)
                     dateInput.setAttribute("min",dateYear+"-"+dateMonth+"-01")
                     dateInput.setAttribute("max",dateYear+"-"+dateMonth+"-"+getLastDay(dateMonth,dateYear))
@@ -137,7 +142,7 @@ function uploadInvoice(uploadedFile = true, season="", month=""){
                     addSessionButton = document.createElement("input")
                     addSessionButton.setAttribute("type", "button")
                     addSessionButton.setAttribute("value", "Add Session")
-                    addSessionButton.setAttribute("onclick", "addSessionImport("+i+")")
+                    addSessionButton.setAttribute("onclick", "addSessionImport("+i+", '"+season+"')")
                     addSessionSpan.appendChild(addSessionButton)
 
                     divContainer.appendChild(newCalRow)
@@ -227,11 +232,11 @@ function uploadInvoice(uploadedFile = true, season="", month=""){
                                 deleteButton.setAttribute("value","Delete Session")
                                 deleteButton.addEventListener("click",deleteSession)
                                 infoDiv.appendChild(deleteButton)
-                                ++i
-                                lastImportDay = i
                             }
                         }
                     }
+                    ++i
+                    lastImportDay = i
                 }
 
                 //add button to add new sessions
@@ -364,22 +369,22 @@ function updateImport(month, year, name, rate){
 
     for (i = 0; i < lastImportDay; i++){
         sessionsList = {}
-        if (document.getElementsByClassName('importday'+i).length != 0 && document.getElementsByClassName("import-session-type"+i) != 0 && document.getElementsByClassName("import-session-amount"+i) != 0){
-            sessions = document.getElementsByClassName("importday"+i)
-            sessionSelect = document.getElementsByClassName("import-session-type"+i)
-            sessionAmount = document.getElementsByClassName("import-session-amount"+i)
-            dateOutput = date[dateArrayIndex].value
-            for (x = 0; x < sessions.length; x ++){
-                text = "session"+x
-                sessionsList[text] = {"type": sessionSelect[x].value, "amount": sessionAmount[x].value}
-            }
-            if (document.getElementById('importcheckbox'+i).checked){
-                coverName = document.getElementById('importcovername'+i).value
-            } else {
-                coverName = ""
-            }
-            data[dateOutput] = {'sessions': sessionsList, 'cover': coverName}
-            dateArrayIndex++
+        if (document.getElementById("importday"+i) != null){
+                sessions = document.getElementsByClassName("importday"+i)
+                sessionSelect = document.getElementsByClassName("import-session-type"+i)
+                sessionAmount = document.getElementsByClassName("import-session-amount"+i)
+                dateOutput = date[dateArrayIndex].value
+                for (x = 0; x < sessions.length; x ++){
+                    text = "session"+x
+                    sessionsList[text] = {"type": sessionSelect[x].value, "amount": sessionAmount[x].value}
+                }
+                if (document.getElementById('importcheckbox'+i).checked){
+                    coverName = document.getElementById('importcovername'+i).value
+                } else {
+                    coverName = ""
+                }
+                data[dateOutput] = {'sessions': sessionsList, 'cover': coverName}
+                dateArrayIndex++
         }
     }
 

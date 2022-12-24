@@ -239,21 +239,23 @@ function submitForm(){
 
     for (i = 0; i <= sessionDay; i++){
         sessionsList = {}
-        date = document.getElementsByClassName("dateSelection")[i].value
-        sessions = document.getElementsByClassName("day"+i)
-        sessionSelect = document.getElementsByClassName("sessionSelect"+i)
-        sessionAmount = document.getElementsByClassName("sessionAmount"+i)
-        for (x = 0; x < sessions.length; x ++){
-            text = "session"+x
-            sessionsList[text] = {"type": sessionSelect[x].value, "amount": sessionAmount[x].value}
-        }
+        if (document.getElementById("day"+i) != null){
+            date = document.getElementsByClassName("dateSelection")[i].value
+            sessions = document.getElementsByClassName("day"+i)
+            sessionSelect = document.getElementsByClassName("sessionSelect"+i)
+            sessionAmount = document.getElementsByClassName("sessionAmount"+i)
+            for (x = 0; x < sessions.length; x ++){
+                text = "session"+x
+                sessionsList[text] = {"type": sessionSelect[x].value, "amount": sessionAmount[x].value}
+            }
 
-        if (document.getElementById("checkbox"+i).checked){
-            coverName = document.getElementById("covername"+i).value
-        } else {
-            coverName = ""
+            if (document.getElementById("checkbox"+i).checked){
+                coverName = document.getElementById("covername"+i).value
+            } else {
+                coverName = ""
+            }
+            data[date] = {"sessions": sessionsList, "cover": coverName}
         }
-        data[date] = {"sessions": sessionsList, "cover": coverName}
     }
 
     var request = $.ajax({

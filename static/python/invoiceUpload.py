@@ -8,9 +8,11 @@ class invoiceUpload(createInvoice):
     filename = ""
     uploadPath = "invoice/upload/"
 
-    def __init__(self,  filename: str, season: str= "", month: str= "", name: str= "", rate: str= "", comments: str= "", sessions: dict={}):
+    def __init__(self,  filename: str, uploadedFile = True, season: str= "", month: str= "", name: str= "", rate: str= "", comments: str= "", sessions: dict={}):
         self.filename = filename
         self.uploadPath += filename
+        if (not uploadedFile):
+            self.uploadPath = self.uploadPath.replace("upload", "output")
         super().__init__(season, month, name, rate, comments, sessions)
     
     def getUploadPath(self):

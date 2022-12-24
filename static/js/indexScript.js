@@ -1,5 +1,4 @@
 var sessionDay = 0
-var lastImportDay = 0
 
 let options = {
     "default": {
